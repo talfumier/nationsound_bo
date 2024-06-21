@@ -1,0 +1,156 @@
+/*GLOBAL CSS styles*/
+
+/* FONT STYLES */
+/* @import 'ngx-toastr/toastr'; */
+/* Styles for toast messages*/
+@import url('https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+/* GLOBAL APP STYLES */
+:root {
+  --red: rgb(223, 6, 17);
+  --red-opaque8: rgb(223, 6, 17, .8);
+  --red-opaque9: rgb(223, 6, 17, .9);
+  --orange: #b65f28;
+  --orange-opaque8: rgb(182, 95, 40, .8);
+  --black-opaque8: rgb(36, 35, 35, .8);
+  --black-opaque9: rgb(36, 35, 35, .9);
+  --black: rgb(36, 35, 35);
+  --yellow: #FFD543;
+  --yellow-opaque9: rgb(255, 213, 67, .9);
+  --white: #FFFFFF;
+  --white-opaque8: rgb(255, 255, 255, .8);
+  --white-light: #ECEFF3;
+  --grey-light: #ebedf0;
+  --beige: rgb(240, 234, 200);
+  --beige-opaque8: rgb(240, 234, 200, .8);
+  --beige-opaque9: rgb(240, 234, 200, .9);
+  --blue: #4472C4;
+}
+
+html {
+  font-size: 62.5%;
+  /* 16px*62.5%=10px, 1rem=10px*/
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+body {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: 0;
+  /* Firefox */
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  /* background-color: rgb(255, 0, 0); */
+  box-sizing: border-box;
+  width: 100vw;
+}
+
+h1 {
+  font-family: "Mochiy Pop P One", sans-serif;
+}
+
+h2,
+h3,
+h4,
+h5,
+h6,
+label,
+button {
+  font-family: "Montserrat", sans-serif;
+}
+
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size:2rem;
+}
+
+.debug {
+  font-size: 1.2rem;
+  font-weight: 600;
+  width: 100%;
+  margin: 0;
+  padding: 10px;
+}
+
+/* TOAST MESSAGES */
+.toast-message {
+  font-size: 1.5rem;
+}
+
+/* PAGES */
+.page-container {
+  padding: 10px 20px;
+  width: 100%;
+}
+.page-container hr {
+  height: 2px;
+  background-color: grey;
+  border: none
+}
+/* ICONS - BUTTONS */
+.fa-solid {
+  color: white;
+}
+.btn {
+  display:flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  font-size:1.7rem;
+  font-weight:600;
+  color: var(--white);
+  padding:5px 15px;
+  border:none;
+  border-radius: 15px;
+  cursor: pointer;
+  height:3rem;
+}
+.btn-info {
+  background-color: var(--blue);
+}
+.btn span {
+  margin-left:10px;
+  text-wrap: nowrap;
+}
+.btn:active {
+  background-color: lightblue;
+  transform: translateY(1px);
+  transition: .3s;
+}
+/* NAVIGATION BAR */
+.navbar {
+  position: relative;
+  font-family: sans-serif;
+  font-size: 1.6rem;
+  font-weight: 550;
+  background-color:aquamarine;
+}
+.navbar p {
+  padding: 5px 10px;
+  margin: 0;
+  cursor: pointer;
+}
+.navbar a:not(.active) p:hover {
+  background-color: var(--white-light);
+  padding-left: 15px;
+  padding-right: 5px;
+  transition: .3s;
+}
+.navbar a.active p {
+  color: var(--red);
+}
+.navbar a:link {
+  text-decoration: none;
+}
+.navbar a:visited {
+  text-decoration: none;
+}

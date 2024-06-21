@@ -1,0 +1,36 @@
+.home {
+  box-sizing:border-box;
+  display:flex;
+  flex-direction: column;
+  justify-content:left;
+  align-items: top;
+}
+.home img {
+  object-fit:scale-down;
+  padding: 10px 0;
+  width: 95%;
+  max-height:50%;  
+}
+.home p,.home ul {
+  font-size:1.7rem;
+  font-weight:400 ;
+  margin:5px;
+  padding:0;
+}
+.home li{
+  list-style: square;
+  list-style-position: inside;
+  padding-top:5px;
+  padding-left:15px;
+}
+@media (min-width: 1300px) {
+  .home img {
+    width: 80%;
+  }
+
+}
+@media (min-width: 1800px) {
+  .home img {
+    width: 60%;
+  }
+}
