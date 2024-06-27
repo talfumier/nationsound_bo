@@ -3,7 +3,7 @@ import classes from "./home.module.css";
 
 function Home(props) {
   return (
-    <div className={`page-container ${classes.home}`}>
+    <div className={`${classes.home}`}>
       <h2>Présentation de l'application</h2>
       <p>
         Cette application ("back-office") est dédiée aux organisateurs du

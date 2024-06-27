@@ -1,25 +1,40 @@
+import {useEffect} from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import Header from "./components/header/Header.jsx";
 import NavBar from "./components/navbar/NavBar.jsx";
 import Home from "./components/home/Home.jsx";
 import Artists from "./components/artists/Artists.jsx";
+import useArtist from "./stores/storeArtist.js";
+
 import "./css/global.css";
 import "./css/normalize.css";
+import "react-toastify/dist/ReactToastify.css";
+import ContainerToast from "./components/common/toastSwal/ContainerToast.jsx";
 import classes from "./app.module.css";
 
 function App() {
+  const loadArtists = useArtist((state) => state.loadData);
+  useEffect(() => {
+    const abortController = new AbortController();
+    loadArtists(abortController.signal);
+
+    return () => {
+      abortController.abort(); //clean-up code after component has unmounted
+    };
+  }, []);
   return (
     <>
       <Header></Header>
       {/* wrapper necessary for sticky footer*/}
-      <div className={classes.wrapper}>
-        <div className={classes["main-content"]}>
+      <div className="app-wrapper">
+        <div className="app-main-content">
           <BrowserRouter>
             <NavBar></NavBar>
             <Routes>
               <Route path="/" element={<Home></Home>}></Route>
               <Route path="/artists" element={<Artists></Artists>}></Route>
             </Routes>
+            <ContainerToast></ContainerToast>
           </BrowserRouter>
         </div>
       </div>

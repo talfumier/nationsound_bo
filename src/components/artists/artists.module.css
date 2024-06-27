@@ -1,12 +1,2 @@
-.artists .header {
-  display: flex;
-  align-items: center;
-}
-.artists .header h2 {
-  margin-right: 10px;
-}
-@media (min-width: 540px) {
-  .artists .header h2 {
-    margin-right: 50px;
-  }
+.artists {
 }
