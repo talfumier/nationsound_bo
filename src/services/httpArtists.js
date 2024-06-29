@@ -14,3 +14,9 @@ export function getArtistById(id, token, signal) {
     signal,
   });
 }
+export function patchArtist(id, data, token, signal) {
+  return http.patch(`${api}/artists/${id}`, data, {
+    // headers: {"x-auth-token": token},
+    signal,
+  });
+}

@@ -18,7 +18,6 @@ axios.interceptors.response.use(
   },
   async (error) => {
     //catching unexpected errors globally
-    // https://www.dhiwise.com/post/common-axios-network-errors-and-how-to-solve-the
     let text = "";
     if (!error.response) text = "réseau ou connection indisponible.";
     //no response means network error

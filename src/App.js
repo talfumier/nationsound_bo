@@ -4,16 +4,16 @@ import Header from "./components/header/Header.jsx";
 import NavBar from "./components/navbar/NavBar.jsx";
 import Home from "./components/home/Home.jsx";
 import Artists from "./components/artists/Artists.jsx";
+import Artist from "./components/artists/Artist.jsx";
 import useArtist from "./stores/storeArtist.js";
 
 import "./css/global.css";
 import "./css/normalize.css";
 import "react-toastify/dist/ReactToastify.css";
 import ContainerToast from "./components/common/toastSwal/ContainerToast.jsx";
-import classes from "./app.module.css";
 
 function App() {
-  const loadArtists = useArtist((state) => state.loadData);
+  const loadArtists = useArtist((state) => state.load);
   useEffect(() => {
     const abortController = new AbortController();
     loadArtists(abortController.signal);
@@ -33,6 +33,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home></Home>}></Route>
               <Route path="/artists" element={<Artists></Artists>}></Route>
+              <Route path="/artists/:id" element={<Artist></Artist>}></Route>
             </Routes>
             <ContainerToast></ContainerToast>
           </BrowserRouter>

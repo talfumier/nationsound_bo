@@ -82,7 +82,7 @@ h2 {
 div.app-wrapper {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 97px 100%;
+  grid-template-rows: 97px calc(100vh - 97px);
   background-color: var(--grey-light);
   height: 100vh;
   width:100%;
@@ -131,16 +131,22 @@ div.app-main-content {
   grid-column: 2;
   display:grid;
   grid-template-columns: 1fr;
-  grid-template-rows:repeat(3,auto);
+  grid-template-rows: 60px 15px 35px auto;
   background-color: var(--grey-light);
   padding: 10px 20px;
 }
-@media (min-width:400px) {
+.page-container.list {
+  grid-template-rows: 60px 15px 0 auto;
+}
+@media (min-width:460px) {
   .page-container {
-    grid-template-rows: 50px 15px auto;
+    grid-template-rows: 40px 15px 35px auto;
+  }
+  .page-container.list {
+    grid-template-rows: 40px 15px 0 auto;
   }
 }
-.page-container .page-header {
+.page-header {
   display: flex;
   flex-wrap: wrap;
   justify-content: left;
@@ -155,7 +161,12 @@ div.app-main-content {
 }
 .page-header h2 {
   position: relative;
-  margin-right: 60px;
+  margin: 0 10px 0 0;
+}
+@media (min-width:410px){
+  .page-header h2 {
+      margin-right:60px;
+    }
 }
 .page-header h2 span {
   position: absolute;
@@ -171,7 +182,7 @@ div.app-main-content {
   width: 25px;
 }
 div.list-container {
-  grid-row: 3;
+  grid-row: 4;
   height:95%;
   display: flex;
   flex-direction: column;
@@ -180,16 +191,131 @@ div.list-container {
 }
 div.list-item {
   display:flex;
-}
-div.list-item-title {
+  flex-direction: column;
   font-size: 1.5rem;
-  margin:10px 10px;
+  margin: 10px 10px 0;
+}
+label.list-item-title {
+  cursor: pointer;
+}
+label.list-item-title:hover {
+  font-weight: 500;
+}
+label.list-item-title input {
+  cursor: pointer;
+  margin-right:15px;
+}
+div.edit-menu-container {
+  font-size:1.5rem;
+  padding:0 30px;
+}
+div.edit-menu {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 5px;
+  width:200px
+}
+div.edit-menu button {
+  cursor: pointer;
+}
+div.product-details {
+  display:grid;
+  gap: 5px 10px;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  max-width:800px;
+  overflow-y: auto;
+}
+@media (min-width:768px) {
+  div.product-details {
+    gap:15px;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 120px 150px 150px auto;
+  }
+}
+@media (min-width:992px) {
+  div.product-details {
+    gap: 20px;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 120px 150px 150px;
+  }
+}
+/* FORM CONTROLS */
+div.textarea {
+  display:flex;
+  flex-direction: column;
+  font-size: 1.7rem;
+  opacity: 0.8;
+  border:none;
+  max-width:300px;
+}
+div.textarea textarea {
+  padding:5px;
+  border: solid 1px grey;
+  border-radius: 5px;
+  resize: vertical;
+}
+div.textarea textarea.valid {
+  border-color: green;
+}
+div.textarea textarea.not-valid {
+  border-color:red;
+}
+div.textarea textarea:focus {
+  outline: none ;
+  box-shadow: 0 0 10px #719ECE;
+}
+div.alert {
+  font-size:1.5rem;
+  line-height: 2rem;
+  padding:5px 10px;
+  border-radius: 5px;
+  color:red;
+  background-color: rgb(243, 227, 227);
+}
+div.textarea label {
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-style: italic;
+  padding:5px 0;
+}
+/* TOOLBAR */
+.toolbar-container {
+  display:flex;
+  justify-content: left;
+  align-items: top;
+  grid-column: 1/-1;
+  height:30px;
+}
+.save-button {
+  border:none;
+  margin:0 10px 0 0;
+  color: green;
+  cursor: pointer;
+}
+.save-button.disabled {
+  color:orange;
+  cursor:not-allowed;
 }
 /* ICONS - BUTTONS */
 .fa-solid {
   color: white;
 }
-.btn {
+.fa-solid.fa-pencil,.fa-solid.fa-trash {
+  color:grey;
+  margin-right: 5px;
+  height:5px;
+  width:15px;
+}
+button.back-button {
+  border: none;
+  margin-right:10px;
+  cursor: pointer;
+}
+button.back-button .fa-solid {
+  color:var(--blue)
+}
+button.btn {
   display:flex;
   flex-wrap: nowrap;
   justify-content: space-between;
@@ -203,15 +329,17 @@ div.list-item-title {
   cursor: pointer;
   height:3rem;
 }
-.btn-info {
+button.btn-info {
   background-color: var(--blue);
 }
-.btn span {
+button.btn span {
   margin-left:10px;
   text-wrap: nowrap;
 }
-.btn:active {
+button.btn:active {
   background-color: lightblue;
   transform: translateY(1px);
   transition: .3s;
 }
+
+

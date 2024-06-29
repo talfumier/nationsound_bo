@@ -1,29 +1,35 @@
 import {useState, useEffect} from "react";
 import useArtist from "../../stores/storeArtist.js";
-import classes from "./artists.module.css";
+import PageHeader from "../common/PageHeader.jsx";
+import CheckBox from "../common/CheckBox.jsx";
+import EditMenu from "../common/EditMenu.jsx";
 
 function Artists(props) {
   const artists = useArtist((state) => state.artists);
   const len = useArtist((state) => state.len);
+  const active = useArtist((state) => state.selected);
+  const setActive = useArtist((state) => state.select);
 
   return (
-    <div className={`page-container ${classes.artists}`}>
-      <div className="page-header">
-        <h2>
-          Artistes<span>{len}</span>
-        </h2>
-        <button className="btn btn-info">
-          <i className="fa-solid fa-plus fa-1x"></i>
-          <span>Ajouter</span>
-        </button>
-      </div>
+    <div className="page-container list">
+      <PageHeader title="Artistes" len={len}></PageHeader>
       <hr />
       <div className="list-container">
         {artists.map((artist) => {
           return (
             <div key={artist.id} className="list-item">
-              <input type="checkbox" name="" id="" />
-              <div className="list-item-title">{artist.name}</div>
+              <CheckBox
+                label={artist.name}
+                value={active[artist.id] ? active[artist.id] : false}
+                onHandleChange={(ckd) => {
+                  setActive(artist.id, ckd);
+                }}
+              ></CheckBox>
+              <EditMenu
+                id={artist.id}
+                url="/artists"
+                visible={active[artist.id]}
+              ></EditMenu>
             </div>
           );
         })}
