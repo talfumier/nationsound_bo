@@ -196,23 +196,35 @@ div.list-item {
   margin: 10px 10px 0;
 }
 label.list-item-title {
+  position:relative;
   cursor: pointer;
 }
 label.list-item-title:hover {
   font-weight: 500;
 }
 label.list-item-title input {
+  position: absolute;
+  top: 0;
+  left: 0;
   cursor: pointer;
   margin-right:15px;
+}
+label.list-item-title div {
+  margin-left:25px;
 }
 div.edit-menu-container {
   font-size:1.5rem;
   padding:0 30px;
 }
+div.date {
+  font-size:1.2rem;
+  text-align: center;
+  margin:5px auto 3px;
+}
 div.edit-menu {
   display: flex;
   justify-content: space-between;
-  padding-top: 5px;
+  /* padding-top: 5px; */
   width:200px
 }
 div.edit-menu button {
@@ -239,6 +251,19 @@ div.product-details {
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 120px 150px 150px;
   }
+}
+div.page-not-found {
+  display:flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: top;
+  color:var(--orange);
+  padding: 10% 0;
+}
+div.page-not-found h2 {
+  font-size: 3rem;
+  text-align: center;
+  line-height: 5rem;
 }
 /* FORM CONTROLS */
 div.textarea {
@@ -315,7 +340,7 @@ button.back-button {
 button.back-button .fa-solid {
   color:var(--blue)
 }
-button.btn {
+.btn {
   display:flex;
   flex-wrap: nowrap;
   justify-content: space-between;
@@ -329,17 +354,24 @@ button.btn {
   cursor: pointer;
   height:3rem;
 }
-button.btn-info {
+.btn-info {
   background-color: var(--blue);
 }
-button.btn span {
+.btn span {
   margin-left:10px;
   text-wrap: nowrap;
 }
-button.btn:active {
+.btn:active {
   background-color: lightblue;
   transform: translateY(1px);
   transition: .3s;
+}
+a.btn:link {
+  text-decoration: none;
+}
+
+a.btn:visited {
+  text-decoration: none;
 }
 
 

@@ -42,7 +42,7 @@ function Artist() {
     textfields.map((field) => {
       let name = !field.name ? field.label.toLowerCase() : field.name;
       let required = field.required === undefined ? true : field.required;
-      formValid[name] = id === -1 && required ? false : true; //id=-1 > new artist creation case
+      formValid[name] = id == -1 && required ? false : true; //id=-1 > new artist creation case
     });
   }
   useEffect(() => {
@@ -51,17 +51,28 @@ function Artist() {
 
   const artists = useArtist((state) => state.artists);
   const len = useArtist((state) => state.len);
+  const create = useArtist((state) => state.create);
   const update = useArtist((state) => state.update);
 
   const [data, setData] = useState({});
   useEffect(() => {
-    if (artists.length === 0) return;
-    setData(
-      _.filter(artists, (artist) => {
+    let dta = {};
+    if (id != -1 && artists.length > 0)
+      dta = _.filter(artists, (artist) => {
         return artist.id == id;
-      })[0]
-    );
+      })[0];
+    if (!dta) dta = initEmpty();
+    setData(dta);
   }, [artists]);
+  function initEmpty() {
+    const obj = {};
+    textfields.map((field) => {
+      let name = !field.name ? field.label.toLowerCase() : field.name;
+      obj[name] = "";
+    });
+    return obj;
+  }
+
   const abortController = new AbortController();
   useEffect(() => {
     return () => {
@@ -89,8 +100,8 @@ function Artist() {
     return bl;
   }
   async function handleSave() {
-    console.log(updatedData);
-    const res = await update(id, updatedData, abortController.signal);
+    if (id == -1) await create(updatedData, abortController.signal);
+    else await update(id, updatedData, abortController.signal);
 
     setStatus({...toolbarStatus, save: false});
   }

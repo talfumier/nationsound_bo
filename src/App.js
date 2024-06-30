@@ -6,6 +6,7 @@ import Home from "./components/home/Home.jsx";
 import Artists from "./components/artists/Artists.jsx";
 import Artist from "./components/artists/Artist.jsx";
 import useArtist from "./stores/storeArtist.js";
+import NotFound from "./components/notFound/NotFound.jsx";
 
 import "./css/global.css";
 import "./css/normalize.css";
@@ -34,6 +35,7 @@ function App() {
               <Route path="/" element={<Home></Home>}></Route>
               <Route path="/artists" element={<Artists></Artists>}></Route>
               <Route path="/artists/:id" element={<Artist></Artist>}></Route>
+              <Route path="*" element={<NotFound></NotFound>}></Route>
             </Routes>
             <ContainerToast></ContainerToast>
           </BrowserRouter>

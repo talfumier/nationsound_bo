@@ -1,18 +1,31 @@
-import {useState, useEffect} from "react";
+import {useEffect} from "react";
 import useArtist from "../../stores/storeArtist.js";
 import PageHeader from "../common/PageHeader.jsx";
 import CheckBox from "../common/CheckBox.jsx";
 import EditMenu from "../common/EditMenu.jsx";
 
-function Artists(props) {
+function Artists() {
+  const url = "/artists";
+
   const artists = useArtist((state) => state.artists);
   const len = useArtist((state) => state.len);
   const active = useArtist((state) => state.selected);
   const setActive = useArtist((state) => state.select);
+  const remove = useArtist((state) => state.delete);
 
+  const abortController = new AbortController();
+  useEffect(() => {
+    return () => {
+      abortController.abort(); //clean-up code after component has unmounted
+    };
+  }, []);
+
+  function handleDelete(id) {
+    remove(id, abortController.signal);
+  }
   return (
     <div className="page-container list">
-      <PageHeader title="Artistes" len={len}></PageHeader>
+      <PageHeader title="Artistes" len={len} url={url}></PageHeader>
       <hr />
       <div className="list-container">
         {artists.map((artist) => {
@@ -27,8 +40,12 @@ function Artists(props) {
               ></CheckBox>
               <EditMenu
                 id={artist.id}
-                url="/artists"
+                url={url}
+                date={artist.updatedAt}
                 visible={active[artist.id]}
+                onHandleDelete={() => {
+                  handleDelete(artist.id);
+                }}
               ></EditMenu>
             </div>
           );

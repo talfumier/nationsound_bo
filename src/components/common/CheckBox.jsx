@@ -10,7 +10,7 @@ function CheckBox({label, value, onHandleChange}) {
           onHandleChange(e.target.checked);
         }}
       />
-      {label}
+      <div>{label}</div>
     </label>
   );
 }

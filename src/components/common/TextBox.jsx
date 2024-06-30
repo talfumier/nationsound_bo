@@ -3,10 +3,10 @@ import {useEffect, useState} from "react";
 function TextBox({name, label, type, required, value, rows, onHandleChange}) {
   const [data, setData] = useState("");
   const [dirty, setDirty] = useState(false);
-  const [fieldValid, setFieldValid] = useState(false);
+  const [fieldValid, setFieldValid] = useState(true);
   useEffect(() => {
     setData(value);
-    setFieldValid(validate(value));
+    if (required) setFieldValid(validate(value));
   }, [value]);
 
   function validate(value) {
