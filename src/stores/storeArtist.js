@@ -22,7 +22,7 @@ const useArtist = create((set, get) => ({
       }));
     } catch (error) {} //error handling in httpService.js
   },
-  create: async (data, signal) => {
+  create: async (data, signal, msg = true) => {
     try {
       const {data: res} = await postArtist(data, null, signal);
       const artists = get().artists;
@@ -31,15 +31,17 @@ const useArtist = create((set, get) => ({
         artists: _.orderBy([...artists], ["name"], ["asc"]),
         len: get().len + 1,
       }));
-      toastSuccess(
-        await translate({
-          text: `${res.message}`,
-          to: "fr",
-        })
-      );
+      if (msg)
+        toastSuccess(
+          await translate({
+            text: `${res.message}`,
+            to: "fr",
+          })
+        );
+      return res.data;
     } catch (error) {} //actual expected and unexpected error handling in httpService.js
   },
-  update: async (id, data, signal) => {
+  update: async (id, data, signal, msg = true) => {
     try {
       const {data: res} = await patchArtist(id, data, null, signal);
       const artists = get().artists;
@@ -48,17 +50,18 @@ const useArtist = create((set, get) => ({
       set(() => ({
         artists: [...artists],
       }));
-      toastSuccess(
-        await translate({
-          text: `${res.message}`,
-          to: "fr",
-        })
-      );
+      if (msg)
+        toastSuccess(
+          await translate({
+            text: `${res.message}`,
+            to: "fr",
+          })
+        );
     } catch (error) {} //actual expected and unexpected error handling in httpService.js
   },
-  delete: async (id, signal) => {
+  delete: async (id, signal, msg = true) => {
     try {
-      const {data: res} = await deleteArtist(id, null, signal);
+      const {data: res} = await deleteArtist(id, null, signal); //associated images (if any) deleted as well
       const artists = get().artists;
       const idx = artists.findIndex((artist) => artist.id == id);
       artists.splice(idx, 1);
@@ -66,12 +69,13 @@ const useArtist = create((set, get) => ({
         artists: [...artists],
         len: get().len - 1,
       }));
-      toastSuccess(
-        await translate({
-          text: `${res.message}`,
-          to: "fr",
-        })
-      );
+      if (msg)
+        toastSuccess(
+          await translate({
+            text: `${res.message}`,
+            to: "fr",
+          })
+        );
     } catch (error) {} //actual expected and unexpected error handling in httpService.js
   },
   select: (id, ckd) => {

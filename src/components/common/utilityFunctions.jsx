@@ -12,3 +12,32 @@ export function getFormattedDate(date, frmt) {
     console.log("Error in getFormattedDate - utilityFunctions", error);
   }
 }
+export function getRandomInt(min, max) {
+  const minCeiled = Math.ceil(min);
+  const maxFloored = Math.floor(max);
+  return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
+}
+export function range(start, end) {
+  return Array(end - start + 1)
+    .fill()
+    .map((_, idx) => start + idx);
+}
+export function fileSize(size) {
+  if (size < 1024) {
+    return `${size} bytes`;
+  } else if (size >= 1024 && size < 1048576) {
+    return `${(size / 1024).toFixed(1)} KB`;
+  } else if (size >= 1048576) {
+    return `${(size / 1048576).toFixed(1)} MB`;
+  }
+}
+export function getEmptyImage() {
+  return {
+    name: "",
+    main: false,
+    type: "",
+    size: 0,
+    lastModified: 0,
+    data: "",
+  };
+}

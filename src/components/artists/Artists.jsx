@@ -11,7 +11,7 @@ function Artists() {
   const len = useArtist((state) => state.len);
   const active = useArtist((state) => state.selected);
   const setActive = useArtist((state) => state.select);
-  const remove = useArtist((state) => state.delete);
+  const deleteArtist = useArtist((state) => state.delete);
 
   const abortController = new AbortController();
   useEffect(() => {
@@ -21,7 +21,7 @@ function Artists() {
   }, []);
 
   function handleDelete(id) {
-    remove(id, abortController.signal);
+    deleteArtist(id, abortController.signal); //delete associated image container (if any)
   }
   return (
     <div className="page-container list">

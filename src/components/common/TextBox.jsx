@@ -20,9 +20,7 @@ function TextBox({name, label, type, required, value, rows, onHandleChange}) {
   }
   return (
     <div className="textarea">
-      <label className={`${fieldValid ? "valid" : "not-valid"}`}>{`${label}${
-        required ? " *" : ""
-      }`}</label>
+      <label>{`${label}${required ? " *" : ""}`}</label>
       <textarea
         type={type}
         className={`text ${fieldValid ? "valid" : "not-valid"}`}
