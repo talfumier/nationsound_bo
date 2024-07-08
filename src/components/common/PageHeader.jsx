@@ -17,7 +17,11 @@ function PageHeader({title, len, url}) {
         <span>{len}</span>
       </h2>
       {url && (
-        <NavLink className="btn btn-info" to={{pathname: `${url}/-1`}}>
+        <NavLink
+          className="btn btn-info"
+          to={{pathname: `${url}/-1`}}
+          state={{data: null, len: len + 1}}
+        >
           <i className="fa-solid fa-plus fa-1x"></i>
           <span>Ajouter</span>
         </NavLink>

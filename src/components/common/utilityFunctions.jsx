@@ -41,3 +41,12 @@ export function getEmptyImage() {
     data: "",
   };
 }
+export function fillUpContainer(cont) {
+  let n = cont.images.length;
+  if (n >= 3) return cont;
+  do {
+    cont.images.push(getEmptyImage());
+    n += 1;
+  } while (n < 3);
+  return cont;
+}

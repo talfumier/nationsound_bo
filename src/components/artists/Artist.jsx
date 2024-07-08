@@ -1,21 +1,30 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, useContext} from "react";
+import {useLocation} from "react-router-dom";
 import {useParams} from "react-router-dom";
 import _ from "lodash";
-import useArtist from "../../stores/storeArtist.js";
-import useImage from "../../stores/storeImage.js";
-import {getEmptyImage} from "../common/utilityFunctions.jsx";
+import SelectionContext from "../../services/context/SelectionContext.js";
+import ImagesContext from "../../services/context/ImagesContext.js";
+import {fillUpContainer} from "../common/utilityFunctions.jsx";
 import PageHeader from "../common/PageHeader.jsx";
 import Toolbar from "../common/Toolbar.jsx";
 import TextBox from "../common/TextBox.jsx";
 import ImageUnit from "../common/ImageUnit.jsx";
 import {range} from "../common/utilityFunctions.jsx";
 import {toastSuccess} from "../common/toastSwal/ToastMessages.js";
+import {postArtist, patchArtist} from "../../services/httpArtists.js";
+import {
+  postContainer,
+  deleteContainer,
+  getContainerById,
+  updateContainer,
+} from "../../services/httpImages.jsx";
 
 let updatedData = {},
   updatedImages = [],
   formValid = {};
 function Artist() {
   const {id} = useParams(); //route parameter
+  const location = useLocation();
   const abortController = new AbortController();
   const signal = abortController.signal;
   const textfields = [
@@ -57,58 +66,44 @@ function Artist() {
   useEffect(() => {
     initFormValid();
   }, []);
-
-  const artists = useArtist((state) => state.artists);
-  const len = useArtist((state) => state.len);
-  const create = useArtist((state) => state.create);
-  const update = useArtist((state) => state.update);
-  /* DEALING WITH ARTIST DATA */
-  const [data, setData] = useState({});
+  /* ARTIST DATA */
+  const contextSelection = useContext(SelectionContext);
+  const [artist, setArtist] = useState({});
   useEffect(() => {
-    let dta = {};
-    if (id != -1 && artists.length > 0)
-      dta = _.filter(artists, (artist) => {
-        return artist.id == id;
-      })[0];
-    if (Object.keys(dta).length === 0) dta = initEmpty();
-    setData(dta);
-  }, [artists]);
-  function initEmpty() {
-    const obj = {};
-    textfields.map((field) => {
-      let name = !field.name ? field.label.toLowerCase() : field.name;
-      obj[name] = "";
-    });
-    obj.images_id = null;
-    return obj;
-  }
-  /* DEALING WITH IMAGES DATA */
-  const load = useImage((state) => state.loadById);
-  const deleteContainer = useImage((state) => state.delete);
-  const updateContainer = useImage((state) => state.update);
-  const createContainer = useImage((state) => state.create);
-  const [images, setImages] = useState({_id: null, images: []});
-  // useEffect(() => {
-  //   if (id == -1 || !data.images_id) return;
-  //   async function loadData() {
-  //     const imgs = await load(data.images_id, signal);
-  //     setImages(imgs);
-  //   }
-  //   loadData();
-  // }, [data.images_id]);
-  useEffect(() => {
-    async function loadData() {
-      let imgs = {_id: null, images: []};
-      if (id == -1 || !data.images_id)
-        do {
-          imgs.images.push(getEmptyImage());
-        } while (imgs.images.length < 3);
-      else imgs = await load(data.images_id, signal);
-      setImages(imgs);
-      console.log("use", imgs);
+    // artist data initialization
+    function initEmpty() {
+      const obj = {};
+      textfields.map((field) => {
+        let name = !field.name ? field.label.toLowerCase() : field.name;
+        obj[name] = "";
+      });
+      obj.images_id = null;
+      return obj;
     }
-    loadData();
-  }, [data.images_id]);
+    setArtist(id != -1 ? location.state.data : initEmpty());
+  }, []);
+  /* IMAGES DATA */
+  const contextImages = useContext(ImagesContext);
+  const [images, setImages] = useState(
+    fillUpContainer({_id: null, images: []})
+  );
+  useEffect(() => {
+    // images data initialization
+    async function loadContainer(_id, signal) {
+      if (id != -1 && _id) {
+        const cont = _.filter(contextImages.containers, (item) => {
+          return item._id === artist.images_id;
+        })[0];
+        if (cont) setImages(fillUpContainer(cont));
+        else {
+          const {data: res} = await getContainerById(_id, signal);
+          contextImages.onHandleImages(null, res.data, "add");
+          setImages(fillUpContainer(res.data));
+        }
+      }
+    }
+    loadContainer(artist.images_id, signal);
+  }, [contextImages.containers, artist.images_id]);
   /* CLEAN UP */
   useEffect(() => {
     return () => {
@@ -131,7 +126,7 @@ function Artist() {
         }
         break;
       default:
-        if (value !== data[name]) updatedData[name] = value;
+        if (value !== artist[name]) updatedData[name] = value;
         else delete updatedData[name];
     }
     const status = {...toolbarStatus};
@@ -143,8 +138,6 @@ function Artist() {
     setStatus(status);
   }
   async function handleSave() {
-    console.log("updatedData", updatedData, updatedImages, images);
-    let dta = {...data};
     /* IMAGES DATA PROCESSING */
     const imgs = {...images};
     updatedImages.map((item) => {
@@ -154,47 +147,61 @@ function Artist() {
     imgs.images.map((item) => {
       if (!bl && item.name.length > 0) bl = true;
     });
-    if (!bl && data.images_id) {
-      await deleteContainer(data.images_id, signal); //delete image container in API (mongoDB)
-      await update(data.id, {images_id: null}, signal, false); //update artist in API (MySQL)
-      dta.images_id = null;
+    if (!bl && artist.images_id) {
+      await deleteContainer(artist.images_id, null, signal); //delete image container in API (mongoDB)
+      contextImages.onHandleImages(artist.images_id, "remove");
+      await patchArtist(artist.id, {images_id: null}, null, signal); //update artist in API (MySQL)
+      updatedData.images_id = null;
     }
-    let body = null,
-      res = null;
+    let body = null;
     if (bl && updatedImages.length > 0) {
       body = _.filter(imgs.images, (item) => {
         return item.name.length > 0;
       });
-      if (data.images_id)
+      if (artist.images_id) {
         //existing image container
-        await updateContainer(data.images_id, {images: body}, signal, false);
-      else {
+        await updateContainer(artist.images_id, {images: body}, null, signal);
+        contextImages.onHandleImages(
+          artist.images_id,
+          {images: body},
+          "update"
+        );
+      } else {
         //no existing image container
-        res = await createContainer({images: body}, signal, false);
-        dta.images_id = res._id; //update artist state clone i.a.w newly images container
+        const {data: res} = await postContainer({images: body}, null, signal);
+        contextImages.onHandleImages(
+          null,
+          {_id: res.data._id, images: body},
+          "add"
+        );
+        updatedData.images_id = res.data._id;
       }
     }
     /* ARTIST DATA PROCESSING */
-    if (updatedData) {
-      body = {...updatedData, images_id: dta.images_id ? dta.images_id : null};
+    if (Object.keys(updatedData).length > 0) {
       if (id == -1) {
-        res = await create(body, signal, false);
-        body.id = res.id;
-      } else await update(id, body, signal, false);
-      dta = {...body};
+        if (!updatedData.images_id) updatedData.images_id = null;
+        const {data: res} = await postArtist(updatedData, null, signal);
+        updatedData.id = res.data.id;
+        contextSelection.onHandleSelected("artist", updatedData.id, true);
+      } else await patchArtist(id, updatedData, null, signal);
+      setArtist({...artist, ...updatedData}); //update artist local state
     }
-    setData(dta); //update artist local state
-    console.log("save", imgs);
+
     setImages(imgs); //update images local state
     setStatus({...toolbarStatus, save: false});
     toastSuccess(
-      `Artist '${dta.name}' ${id == -1 ? "créé" : "mis à jour"} avec succès !`
+      `Artist '${{...artist, ...updatedData}.name}' ${
+        id == -1 ? "créé" : "mis à jour"
+      } avec succès !`
     );
+    updatedData = {};
+    updatedImages = [];
   }
 
   return (
     <div className="page-container">
-      <PageHeader title="Artistes" len={len}></PageHeader>
+      <PageHeader title="Artistes" len={location.state.len}></PageHeader>
       <hr />
       <Toolbar status={toolbarStatus} onHandleSave={handleSave}></Toolbar>
       <div className="product-details">
@@ -207,7 +214,7 @@ function Artist() {
               label={field.label}
               type={field.type ? field.type : "text"}
               required={field.required === undefined ? true : field.required}
-              value={data[name]}
+              value={artist[name]}
               rows={!field.rows ? "3" : field.rows}
               onHandleChange={handleChange}
             ></TextBox>

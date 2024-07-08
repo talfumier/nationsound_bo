@@ -2,14 +2,17 @@ import {NavLink} from "react-router-dom";
 import {SwalOkCancel} from "./toastSwal/SwalOkCancel.jsx";
 import {getFormattedDate} from "./utilityFunctions.jsx";
 
-function EditMenu({id, url, date, visible, onHandleDelete}) {
+function EditMenu({url, data: dataIn, onHandleDelete}) {
+  const {data, len} = dataIn;
   return (
     <div className="edit-menu-container">
-      {visible && (
+      {data.active && (
         <>
-          <div className="date">{`Mis à jour : ${getFormattedDate(date)}`}</div>
+          <div className="date">{`Mis à jour : ${getFormattedDate(
+            data.updatedAt
+          )}`}</div>
           <div className="edit-menu">
-            <NavLink to={{pathname: `${url}/${id}`}}>
+            <NavLink to={{pathname: `${url}/${data.id}`}} state={{data, len}}>
               <i className="fa-solid fa-pencil fa-1x"></i>
               <span>Modifier</span>
             </NavLink>

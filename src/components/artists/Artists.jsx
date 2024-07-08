@@ -1,31 +1,52 @@
-import {useEffect} from "react";
-import useArtist from "../../stores/storeArtist.js";
+import {useState, useEffect, useContext} from "react";
+import _ from "lodash";
+import SelectionContext from "../../services/context/SelectionContext.js";
+import ImagesContext from "../../services/context/ImagesContext.js";
+import {getAllArtists, deleteArtist} from "../../services/httpArtists.js";
 import PageHeader from "../common/PageHeader.jsx";
 import CheckBox from "../common/CheckBox.jsx";
 import EditMenu from "../common/EditMenu.jsx";
+import {toastSuccess} from "../common/toastSwal/ToastMessages.js";
 
 function Artists() {
   const url = "/artists";
-
-  const artists = useArtist((state) => state.artists);
-  const len = useArtist((state) => state.len);
-  const active = useArtist((state) => state.selected);
-  const setActive = useArtist((state) => state.select);
-  const deleteArtist = useArtist((state) => state.delete);
-
+  const contextSelection = useContext(SelectionContext);
+  const contextImages = useContext(ImagesContext);
   const abortController = new AbortController();
+
+  const [artists, setArtists] = useState([]);
   useEffect(() => {
+    async function loadArtists(signal) {
+      const {data: res} = await getAllArtists(null, signal);
+      setArtists(
+        res.data.map((item) => {
+          return {
+            ...item,
+            active:
+              contextSelection.selected["artist"] === item.id ? true : false,
+          };
+        })
+      );
+    }
+    loadArtists(abortController.signal);
     return () => {
       abortController.abort(); //clean-up code after component has unmounted
     };
   }, []);
-
-  function handleDelete(id) {
-    deleteArtist(id, abortController.signal); //delete associated image container (if any)
+  async function handleDelete(id) {
+    const {data: res} = await deleteArtist(id, null, abortController.signal); //associated images (if any) deleted as well
+    contextImages.onHandleImages(res.data.images_id, null, "remove");
+    contextSelection.onHandleSelected("artist", -1, false);
+    setArtists(
+      _.filter(artists, (item) => {
+        return item.id !== id;
+      })
+    );
+    toastSuccess(`Artist '${res.data.name}' supprimé avec succès !`);
   }
   return (
     <div className="page-container list">
-      <PageHeader title="Artistes" len={len} url={url}></PageHeader>
+      <PageHeader title="Artistes" len={artists.length} url={url}></PageHeader>
       <hr />
       <div className="list-container">
         {artists.map((artist) => {
@@ -33,16 +54,19 @@ function Artists() {
             <div key={artist.id} className="list-item">
               <CheckBox
                 label={artist.name}
-                value={active[artist.id] ? active[artist.id] : false}
+                value={artist.active ? artist.active : false}
                 onHandleChange={(ckd) => {
-                  setActive(artist.id, ckd);
+                  const data = [...artists];
+                  data.map((item) => {
+                    return (item.active = item.id === artist.id ? ckd : false);
+                  });
+                  contextSelection.onHandleSelected("artist", artist.id, ckd);
+                  setArtists(data);
                 }}
               ></CheckBox>
               <EditMenu
-                id={artist.id}
                 url={url}
-                date={artist.updatedAt}
-                visible={active[artist.id]}
+                data={{data: artist, len: artists.length}}
                 onHandleDelete={() => {
                   handleDelete(artist.id);
                 }}
