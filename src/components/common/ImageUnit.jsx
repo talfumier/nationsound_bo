@@ -10,7 +10,7 @@ import {
 import config from "../../config.json";
 import {toastError} from "./toastSwal/ToastMessages.js";
 
-function ImageUnit({idx, dataIn, onHandleChange}) {
+function ImageUnit({idx, dataIn, onHandleChange, onHandleMain}) {
   const textfields = [
     {name: "name", label: "Fichier"},
     {name: "type", label: "Type"},
@@ -118,9 +118,12 @@ function ImageUnit({idx, dataIn, onHandleChange}) {
       </div>
       {value && value.data && (
         <>
-          <button className="publish">{`${
-            value.main ? "PHOTO EN LIGNE" : "METTRE EN LIGNE"
-          }`}</button>
+          <button
+            className="publish"
+            onClick={() => {
+              onHandleMain(!value.main);
+            }}
+          >{`${value.main ? "PHOTO EN LIGNE" : "METTRE EN LIGNE"}`}</button>
           <div className="image">
             <img src={value.data} alt={value.name} />
           </div>

@@ -10,7 +10,7 @@ import Toolbar from "../common/Toolbar.jsx";
 import TextBox from "../common/TextBox.jsx";
 import ImageUnit from "../common/ImageUnit.jsx";
 import {range} from "../common/utilityFunctions.jsx";
-import {toastSuccess} from "../common/toastSwal/ToastMessages.js";
+import {toastSuccess, toastWarning} from "../common/toastSwal/ToastMessages.js";
 import {postArtist, patchArtist} from "../../services/httpArtists.js";
 import {
   postContainer,
@@ -125,7 +125,7 @@ function Artist() {
           updatedImages = [...updatedImages, ...[[idx, value]]];
         }
         break;
-      default:
+      default: //artist text fields
         if (value !== artist[name]) updatedData[name] = value;
         else delete updatedData[name];
     }
@@ -136,6 +136,25 @@ function Artist() {
         (Object.keys(updatedData).length > 0 || updatedImages.length > 0) &&
         valid; //save operation authorized when actual change and complete form is validated
     setStatus(status);
+  }
+  function handleMain(val, idx) {
+    let bl = false;
+    updatedImages.map((item) => {
+      if (!bl && item[0] === 2) bl = true; //new image not yet saved
+    });
+    if (bl) {
+      toastWarning("Merci d'enregistrer l'image avant de la mettre en ligne !");
+      return;
+    }
+    const imgs = _.cloneDeep(images);
+    imgs.images.map((item, i) => {
+      if (!val && i === idx) return (item.main = false);
+      if (val) return (item.main = i === idx ? true : false);
+    });
+    imgs.images.map((item, i) => {
+      handleChange("images", true, item, i);
+    });
+    setImages(imgs);
   }
   async function handleSave() {
     /* IMAGES DATA PROCESSING */
@@ -229,6 +248,9 @@ function Artist() {
               dataIn={images.images[idx]}
               onHandleChange={(val) => {
                 handleChange("images", true, val, idx);
+              }}
+              onHandleMain={(val) => {
+                handleMain(val, idx);
               }}
             ></ImageUnit>
           );
