@@ -22,8 +22,9 @@ export function postContainer(data, token, signal) {
   });
 }
 export function updateContainer(id, data, token, signal) {
-  return http.patch(`${api}/images/${id}`, data, {
-    // headers: {"x-auth-token": token},
+  return http.put(`${api}/images/${id}`, data, {
+    // headers: {"x-auth-token": token},"Access-Control-Allow-Origin", "http://localhost:3000"
+    // headers: {"Access-Control-Allow-Origin": "http://localhost:3000"},
     signal,
   });
 }

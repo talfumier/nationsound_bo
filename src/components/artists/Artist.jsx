@@ -55,6 +55,7 @@ function Artist() {
       rows: "5",
     },
   ];
+  const [reset, setReset] = useState(0);
   function initFormValid() {
     textfields.map((field) => {
       let name = !field.name ? field.label.toLowerCase() : field.name;
@@ -81,7 +82,7 @@ function Artist() {
       return obj;
     }
     setArtist(id != -1 ? location.state.data : initEmpty());
-  }, []);
+  }, [reset]);
   /* IMAGES DATA */
   const contextImages = useContext(ImagesContext);
   const [images, setImages] = useState(
@@ -103,7 +104,7 @@ function Artist() {
       }
     }
     loadContainer(artist.images_id, signal);
-  }, [contextImages.containers, artist.images_id]);
+  }, [reset, contextImages.containers, artist.images_id]);
   /* CLEAN UP */
   useEffect(() => {
     return () => {
@@ -137,6 +138,13 @@ function Artist() {
         valid; //save operation authorized when actual change and complete form is validated
     setStatus(status);
   }
+  function handleUndo() {
+    setArtist({});
+    setImages(fillUpContainer({_id: null, images: []}));
+    setReset(reset + 1);
+    setStatus({save: false});
+    resetChangeMonitor();
+  }
   function handleMain(val, idx) {
     let bl = false;
     updatedImages.map((item) => {
@@ -158,7 +166,7 @@ function Artist() {
   }
   async function handleSave() {
     /* IMAGES DATA PROCESSING */
-    const imgs = {...images};
+    const imgs = _.cloneDeep(images);
     updatedImages.map((item) => {
       imgs.images[item[0]] = item[1]; //update images state clone i.a.w updatedImages
     });
@@ -214,15 +222,22 @@ function Artist() {
         id == -1 ? "créé" : "mis à jour"
       } avec succès !`
     );
+    resetChangeMonitor();
+  }
+  function resetChangeMonitor() {
     updatedData = {};
     updatedImages = [];
   }
-
   return (
     <div className="page-container">
       <PageHeader title="Artistes" len={location.state.len}></PageHeader>
       <hr />
-      <Toolbar status={toolbarStatus} onHandleSave={handleSave}></Toolbar>
+      <Toolbar
+        status={toolbarStatus}
+        onHandleSave={handleSave}
+        onHandleUndo={handleUndo}
+      ></Toolbar>
+      <hr />
       <div className="product-details">
         {textfields.map((field) => {
           const name = !field.name ? field.label.toLowerCase() : field.name;

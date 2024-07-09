@@ -35,13 +35,15 @@ function Artists() {
   }, []);
   async function handleDelete(id) {
     const {data: res} = await deleteArtist(id, null, abortController.signal); //associated images (if any) deleted as well
-    contextImages.onHandleImages(res.data.images_id, null, "remove");
-    contextSelection.onHandleSelected("artist", -1, false);
-    setArtists(
-      _.filter(artists, (item) => {
-        return item.id !== id;
-      })
-    );
+    if (res.statusCode === "200") {
+      contextImages.onHandleImages(res.data.images_id, null, "remove");
+      contextSelection.onHandleSelected("artist", -1, false);
+      setArtists(
+        _.filter(artists, (item) => {
+          return item.id !== id;
+        })
+      );
+    }
     toastSuccess(`Artist '${res.data.name}' supprimé avec succès !`);
   }
   return (
