@@ -1,6 +1,6 @@
 import {NavLink} from "react-router-dom";
 import {SwalOkCancel} from "./toastSwal/SwalOkCancel.jsx";
-import {getFormattedDate} from "./utilityFunctions.jsx";
+import {getFormattedDate} from "./utilityFunctions.js";
 
 function EditMenu({url, data: dataIn, onHandleDelete}) {
   const {data, len} = dataIn;

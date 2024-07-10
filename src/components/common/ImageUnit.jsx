@@ -2,11 +2,7 @@ import {useState, useEffect} from "react";
 import {arrayBufferToWebP} from "webp-converter-browser";
 import {toDate} from "date-fns";
 import TextField from "./TextField.jsx";
-import {
-  fileSize,
-  getEmptyImage,
-  getFormattedDate,
-} from "./utilityFunctions.jsx";
+import {fileSize, getEmptyImage, getFormattedDate} from "./utilityFunctions.js";
 import config from "../../config.json";
 import {toastError} from "./toastSwal/ToastMessages.js";
 
