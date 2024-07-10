@@ -19,7 +19,7 @@ import {
 let updatedData = {},
   updatedImages = [],
   formValid = {};
-function FormGeneric({entity, id, imageYes}) {
+function FormDetails({entity, id, imageYes}) {
   // entity > {name:"artist",label:"Artiste",labels:"Artistes",fields,dataIn:{data,len},functions:{patchEntity,postEntity}} | partner,
   //id > route parameter
   const abortController = new AbortController();
@@ -265,4 +265,4 @@ function FormGeneric({entity, id, imageYes}) {
     </>
   );
 }
-export default FormGeneric;
+export default FormDetails;

@@ -3,7 +3,7 @@ import {useLocation} from "react-router-dom";
 import {useParams} from "react-router-dom";
 import _ from "lodash";
 import {postArtist, patchArtist} from "../../services/httpArtists.js";
-import FormGeneric from "../common/FormGeneric.jsx";
+import FormDetails from "../common/FormDetails.jsx";
 
 function Artist() {
   const {id} = useParams(); //route parameter
@@ -57,7 +57,7 @@ function Artist() {
   return (
     Object.keys(entity).length === 6 && (
       <div className="page-container">
-        <FormGeneric id={id} entity={entity} imageYes></FormGeneric>
+        <FormDetails id={id} entity={entity} imageYes></FormDetails>
       </div>
     )
   );
