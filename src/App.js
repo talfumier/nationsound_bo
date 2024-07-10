@@ -1,11 +1,11 @@
-import {useState, useEffect} from "react";
+import {useState} from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import _ from "lodash";
 import Header from "./components/header/Header.jsx";
 import NavBar from "./components/navbar/NavBar.jsx";
 import Home from "./components/home/Home.jsx";
-import Artists from "./components/artists/Artists.jsx";
-import Artist from "./components/artists/Artist.jsx";
+import ListItems from "./components/common/ListItems.jsx";
+import FormDetails from "./components/common/FormDetails.jsx";
 import NotFound from "./components/notFound/NotFound.jsx";
 
 import SelectionContext from "./services/context/SelectionContext.js";
@@ -17,15 +17,11 @@ import "react-toastify/dist/ReactToastify.css";
 import ContainerToast from "./components/common/toastSwal/ContainerToast.jsx";
 
 function App() {
-  const [selected, setSelected] = useState({artist: null});
+  const [selected, setSelected] = useState({artist: null, partner: null});
   const [containers, setContainers] = useState([]);
 
   function handleSelected(cs, id, ckd) {
-    switch (cs) {
-      case "artist":
-        setSelected({artist: ckd ? id : null});
-        break;
-    }
+    setSelected({...selected, [cs]: ckd ? id : null});
   }
   function handleImages(_id, data, cs) {
     let arr = [...containers];
@@ -46,6 +42,57 @@ function App() {
     }
     setContainers(arr);
   }
+  const fields = {
+    artist: {
+      entity: {
+        name: "artist",
+        label: "Artiste",
+        labels: "Artistes",
+      },
+      fields: [
+        //default values when property is missing : type > text, required > true, rows > 3, name > label.toLowerCase()
+        {
+          label: "Nom du groupe",
+          name: "name",
+        },
+        {
+          name: "country",
+          label: "Pays d'origine",
+          rows: "1",
+        },
+        {
+          label: "Style",
+        },
+        {
+          label: "Description",
+          rows: "5",
+        },
+        {
+          label: "Albums",
+          required: false,
+          rows: "5",
+        },
+        {
+          label: "Composition",
+          rows: "5",
+        },
+      ],
+    },
+    partner: {
+      entity: {
+        name: "partner",
+        label: "Partenaire",
+        labels: "Partenaires",
+      },
+      fields: [
+        //default values when property is missing : type > text, required > true, rows > 3, name > label.toLowerCase()
+        {
+          label: "Nom du partenaire",
+          name: "name",
+        },
+      ],
+    },
+  };
   return (
     <>
       <Header></Header>
@@ -62,10 +109,45 @@ function App() {
               >
                 <Routes>
                   <Route path="/" element={<Home></Home>}></Route>
-                  <Route path="/artists" element={<Artists></Artists>}></Route>
+                  <Route
+                    path="/artists"
+                    element={
+                      <ListItems
+                        entity={fields.artist.entity}
+                        url="/artists"
+                        imageYes
+                      ></ListItems>
+                    }
+                  ></Route>
                   <Route
                     path="/artists/:id"
-                    element={<Artist></Artist>}
+                    element={
+                      <FormDetails
+                        entity={fields.artist.entity}
+                        fields={fields.artist.fields}
+                        imageYes
+                      ></FormDetails>
+                    }
+                  ></Route>
+                  <Route
+                    path="/partners"
+                    element={
+                      <ListItems
+                        entity={fields.partner.entity}
+                        url="/partners"
+                        imageYes
+                      ></ListItems>
+                    }
+                  ></Route>
+                  <Route
+                    path="/partners/:id"
+                    element={
+                      <FormDetails
+                        entity={fields.partner.entity}
+                        fields={fields.partner.fields}
+                        imageYes
+                      ></FormDetails>
+                    }
                   ></Route>
                   <Route path="*" element={<NotFound></NotFound>}></Route>
                 </Routes>

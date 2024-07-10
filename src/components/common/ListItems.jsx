@@ -1,5 +1,6 @@
 import {useState, useEffect, useContext} from "react";
 import _ from "lodash";
+import {getEntities, deleteEntity} from "../../services/httpEntities.js";
 import SelectionContext from "../../services/context/SelectionContext.js";
 import ImagesContext from "../../services/context/ImagesContext.js";
 import PageHeader from "./PageHeader.jsx";
@@ -8,7 +9,7 @@ import EditMenu from "./EditMenu.jsx";
 import {toastSuccess} from "./toastSwal/ToastMessages.js";
 
 function ListItems({entity, url, imageYes}) {
-  // entity > {name:"artist",label:"Artiste",labels:"Artistes",functions:{loadItems,deleteItem}} ,
+  // entity > {name:"artist",label:"Artiste",labels:"Artistes"} ,
   const contextSelection = useContext(SelectionContext);
   const contextImages = useContext(ImagesContext);
   const abortController = new AbortController();
@@ -16,7 +17,7 @@ function ListItems({entity, url, imageYes}) {
   const [items, setItems] = useState([]);
   useEffect(() => {
     async function loadData(signal) {
-      const {data: res} = await entity.functions.loadItems(null, signal);
+      const {data: res} = await getEntities(entity.name, null, signal);
       setItems(
         res.data.map((item) => {
           return {
@@ -31,23 +32,17 @@ function ListItems({entity, url, imageYes}) {
     return () => {
       abortController.abort(); //clean-up code after component has unmounted
     };
-  }, []);
+  }, [entity]);
   async function handleDelete(id) {
-    const {data: res} = await entity.functions.deleteItem(
-      id,
-      null,
-      abortController.signal
-    ); //associated images (if any) deleted as well
-    if (res.statusCode === "200") {
-      if (imageYes)
-        contextImages.onHandleImages(res.data.images_id, null, "remove");
-      contextSelection.onHandleSelected(entity.name, -1, false);
-      setItems(
-        _.filter(items, (item) => {
-          return item.id !== id;
-        })
-      );
-    }
+    const {data: res} = await deleteEntity(id, null, abortController.signal); //associated images (if any) deleted as well
+    if (imageYes)
+      contextImages.onHandleImages(res.data.images_id, null, "remove");
+    contextSelection.onHandleSelected(entity.name, -1, false);
+    setItems(
+      _.filter(items, (item) => {
+        return item.id !== id;
+      })
+    );
     toastSuccess(`${entity.label} '${res.data.name}' supprimé avec succès !`);
   }
   return (
@@ -76,7 +71,7 @@ function ListItems({entity, url, imageYes}) {
               ></CheckBox>
               <EditMenu
                 url={url}
-                data={{data: item, len: items.length}}
+                data={{entity, data: item, len: items.length}}
                 onHandleDelete={() => {
                   handleDelete(item.id);
                 }}

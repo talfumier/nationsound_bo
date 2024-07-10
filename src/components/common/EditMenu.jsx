@@ -3,7 +3,7 @@ import {SwalOkCancel} from "./toastSwal/SwalOkCancel.jsx";
 import {getFormattedDate} from "./utilityFunctions.js";
 
 function EditMenu({url, data: dataIn, onHandleDelete}) {
-  const {data, len} = dataIn;
+  const {entity, data, len} = dataIn;
   return (
     <div className="edit-menu-container">
       {data.active && (

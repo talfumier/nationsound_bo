@@ -232,7 +232,7 @@ div.edit-menu {
 div.edit-menu button {
   cursor: pointer;
 }
-form.product-details {
+div.product-details {
   display:grid;
   gap: 0 10px;
   grid-template-columns: 1fr;
@@ -242,14 +242,14 @@ form.product-details {
   overflow-y: auto;
 }
 @media (min-width:768px) {
-  form.product-details {
+  div.product-details {
     gap:0 15px;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(6, auto);
   }
 }
 @media (min-width:992px) {
-  form.product-details {
+  div.product-details {
     gap: 0 20px;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: max(120px) max(150px) max(30px) max(350px);
@@ -353,14 +353,14 @@ div.alert {
   color:red;
   background-color: rgb(243, 227, 227);
 }
-form.product-details label {
+div.product-details label {
   font-size: 1.5rem;
   font-weight: 600;
   opacity: 0.8;
   font-style: italic;
   padding:5px 0;
 }
-form.product-details label.images-label {
+div.product-details label.images-label {
   grid-column: 1/-1;
 }
 div.file-details {

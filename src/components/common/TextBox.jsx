@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 
-function InputBox({name, label, type, required, value, rows, onHandleChange}) {
+function TextBox({name, label, type, required, value, rows, onHandleChange}) {
   const [data, setData] = useState("");
   const [dirty, setDirty] = useState(false);
   const [fieldValid, setFieldValid] = useState(true);
@@ -13,7 +13,6 @@ function InputBox({name, label, type, required, value, rows, onHandleChange}) {
     let result = true;
     switch (type) {
       case "text":
-      case "textarea":
         if (!value || value.length === 0) result = false;
         break;
     }
@@ -22,21 +21,20 @@ function InputBox({name, label, type, required, value, rows, onHandleChange}) {
   return (
     <div className="textarea">
       <label>{`${label}${required ? " *" : ""}`}</label>
-      {type === "textarea" && (
-        <textarea
-          className={`text ${fieldValid ? "valid" : "not-valid"}`}
-          value={data}
-          onChange={(e) => {
-            setDirty(true);
-            setData(e.target.value);
-            let valid = true;
-            if (required && !validate(e.target.value)) valid = false;
-            onHandleChange(name, valid, e.target.value);
-            setFieldValid(valid);
-          }}
-          rows={rows}
-        />
-      )}
+      <textarea
+        type={type}
+        className={`text ${fieldValid ? "valid" : "not-valid"}`}
+        value={data}
+        onChange={(e) => {
+          setDirty(true);
+          setData(e.target.value);
+          let valid = true;
+          if (required && !validate(e.target.value)) valid = false;
+          onHandleChange(name, valid, e.target.value);
+          setFieldValid(valid);
+        }}
+        rows={rows}
+      />
       {dirty && !fieldValid && (
         <div className="alert">Une valeur non nulle est obligatoire !</div>
       )}
@@ -44,4 +42,4 @@ function InputBox({name, label, type, required, value, rows, onHandleChange}) {
   );
 }
 
-export default InputBox;
+export default TextBox;

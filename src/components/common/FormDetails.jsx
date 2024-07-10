@@ -1,14 +1,17 @@
 import {useEffect, useState, useContext} from "react";
+import {useLocation} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import _ from "lodash";
 import SelectionContext from "../../services/context/SelectionContext.js";
 import ImagesContext from "../../services/context/ImagesContext.js";
 import {fillUpContainer} from "./utilityFunctions.js";
 import PageHeader from "./PageHeader.jsx";
 import Toolbar from "./Toolbar.jsx";
-import InputBox from "./InputBox.jsx";
+import TextBox from "./TextBox.jsx";
 import ImageUnit from "./ImageUnit.jsx";
 import {range} from "./utilityFunctions.js";
 import {toastSuccess, toastWarning} from "./toastSwal/ToastMessages.js";
+import {postEntity, patchEntity} from "../../services/httpEntities.js";
 import {
   postContainer,
   deleteContainer,
@@ -19,38 +22,39 @@ import {
 let updatedData = {},
   updatedImages = [],
   formValid = {};
-function FormDetails({entity, id, imageYes}) {
-  // entity > {name:"artist",label:"Artiste",labels:"Artistes",fields,dataIn:{data,len},functions:{patchEntity,postEntity}} | partner,
-  //id > route parameter
+
+function FormDetails({entity, fields, imageYes}) {
+  const {id} = useParams(); //route parameter
+  const location = useLocation();
   const abortController = new AbortController();
   const signal = abortController.signal;
   const [reset, setReset] = useState(0);
   function initFormValid() {
-    entity.fields.map((field) => {
+    fields.map((field) => {
       let name = !field.name ? field.label.toLowerCase() : field.name;
       let required = field.required === undefined ? true : field.required;
       formValid[name] = id == -1 && required ? false : true; //id=-1 > new record creation case
     });
-    if (imageYes) formValid.images_id = true;
+    formValid.images_id = true;
   }
   useEffect(() => {
     initFormValid();
   }, []);
-  /* FIELD DATA */
+  /* FIELDS DATA */
   const contextSelection = useContext(SelectionContext);
-  const [fielddata, setFielddata] = useState({});
+  const [fieldData, setFieldData] = useState({});
   useEffect(() => {
-    // text data initialization
+    // field data initialization
     function initEmpty() {
       const obj = {};
-      entity.fields.map((field) => {
+      fields.map((field) => {
         let name = !field.name ? field.label.toLowerCase() : field.name;
         obj[name] = "";
       });
-      if (imageYes) obj.images_id = null;
+      obj.images_id = null;
       return obj;
     }
-    setFielddata(id != -1 ? entity.dataIn.data : initEmpty());
+    setFieldData(id != -1 ? location.state.data : initEmpty());
   }, [reset]);
   /* IMAGES DATA */
   const contextImages = useContext(ImagesContext);
@@ -62,7 +66,7 @@ function FormDetails({entity, id, imageYes}) {
     async function loadContainer(_id, signal) {
       if (id != -1 && _id) {
         const cont = _.filter(contextImages.containers, (item) => {
-          return item._id === fielddata.images_id;
+          return item._id === fieldData.images_id;
         })[0];
         if (cont) setImages(fillUpContainer(cont));
         else {
@@ -72,8 +76,8 @@ function FormDetails({entity, id, imageYes}) {
         }
       }
     }
-    if (imageYes) loadContainer(fielddata.images_id, signal);
-  }, [reset, contextImages.containers, fielddata.images_id]);
+    if (imageYes) loadContainer(fieldData.images_id, signal);
+  }, [reset, contextImages.containers, fieldData.images_id]);
   /* CLEAN UP */
   useEffect(() => {
     return () => {
@@ -95,8 +99,8 @@ function FormDetails({entity, id, imageYes}) {
           updatedImages = [...updatedImages, ...[[idx, value]]];
         }
         break;
-      default: //text fields
-        if (value !== fielddata[name]) updatedData[name] = value;
+      default: // fields
+        if (value !== fieldData[name]) updatedData[name] = value;
         else delete updatedData[name];
     }
     const status = {...toolbarStatus};
@@ -108,7 +112,7 @@ function FormDetails({entity, id, imageYes}) {
     setStatus(status);
   }
   function handleUndo() {
-    setFielddata({});
+    setFieldData({});
     if (imageYes) setImages(fillUpContainer({_id: null, images: []}));
     setReset(reset + 1);
     setStatus({save: false});
@@ -139,19 +143,20 @@ function FormDetails({entity, id, imageYes}) {
     updatedImages.map((item) => {
       imgs.images[item[0]] = item[1]; //update images state clone i.a.w updatedImages
     });
-    let bl = imageYes ? false : true; //check all 3 images contain no data
+    let bl = false; //check all 3 images contain no data
     imgs.images.map((item) => {
       if (!bl && item.name.length > 0) bl = true;
     });
-    if (!bl && fielddata.images_id) {
-      await deleteContainer(fielddata.images_id, null, signal); //delete image container in API (mongoDB)
-      contextImages.onHandleImages(fielddata.images_id, "remove");
-      await entity.functions.patchEntity(
-        fielddata.id,
+    if (!bl && fieldData.images_id) {
+      await deleteContainer(fieldData.images_id, null, signal); //delete image container in API (mongoDB)
+      contextImages.onHandleImages(fieldData.images_id, "remove");
+      await patchEntity(
+        entity.name,
+        fieldData.id,
         {images_id: null},
         null,
         signal
-      ); //update fielddata in API (MySQL)
+      ); //update field data in API (MySQL)
       updatedData.images_id = null;
     }
     let body = null;
@@ -159,16 +164,16 @@ function FormDetails({entity, id, imageYes}) {
       body = _.filter(imgs.images, (item) => {
         return item.name.length > 0;
       });
-      if (fielddata.images_id) {
+      if (fieldData.images_id) {
         //existing image container
         await updateContainer(
-          fielddata.images_id,
+          fieldData.images_id,
           {images: body},
           null,
           signal
         );
         contextImages.onHandleImages(
-          fielddata.images_id,
+          fieldData.images_id,
           {images: body},
           "update"
         );
@@ -183,25 +188,26 @@ function FormDetails({entity, id, imageYes}) {
         updatedData.images_id = res.data._id;
       }
     }
-    /* FIELD DATA PROCESSING */
+    /* ARTIST DATA PROCESSING */
     if (Object.keys(updatedData).length > 0) {
       if (id == -1) {
         if (imageYes && !updatedData.images_id) updatedData.images_id = null;
-        const {data: res} = await entity.functions.postEntity(
+        const {data: res} = await postEntity(
+          entity.name,
           updatedData,
           null,
           signal
         );
         updatedData.id = res.data.id;
         contextSelection.onHandleSelected(entity.name, updatedData.id, true);
-      } else await entity.functions.patchEntity(id, updatedData, null, signal);
-      setFielddata({...fielddata, ...updatedData}); //update fielddata local state
+      } else await patchEntity(entity.name, id, updatedData, null, signal);
+      setFieldData({...fieldData, ...updatedData}); //update fieldData local state
     }
 
     if (imageYes) setImages(imgs); //update images local state
     setStatus({...toolbarStatus, save: false});
     toastSuccess(
-      `${entity.label} '${{...fielddata, ...updatedData}.name}' ${
+      `${entity.label} '${{...fieldData, ...updatedData}.name}' ${
         id == -1 ? "créé" : "mis à jour"
       } avec succès !`
     );
@@ -212,8 +218,11 @@ function FormDetails({entity, id, imageYes}) {
     updatedImages = [];
   }
   return (
-    <>
-      <PageHeader title={entity.labels} len={entity.dataIn.len}></PageHeader>
+    <div className="page-container">
+      <PageHeader
+        title={`${entity.labels}`}
+        len={location.state.len}
+      ></PageHeader>
       <hr />
       <Toolbar
         status={toolbarStatus}
@@ -221,24 +230,20 @@ function FormDetails({entity, id, imageYes}) {
         onHandleUndo={handleUndo}
       ></Toolbar>
       <hr />
-      <form className="product-details">
-        {entity.fields.map((field) => {
+      <div className={`product-details ${entity.name}`}>
+        {fields.map((field) => {
           const name = !field.name ? field.label.toLowerCase() : field.name;
-          const required = field.required === undefined ? true : field.required;
-          const rows = !field.rows ? "3" : field.rows;
           return (
-            (field.type === "text" || field.type === "textarea") && (
-              <InputBox
-                key={name}
-                name={name}
-                label={field.label}
-                type={field.type}
-                required={required}
-                value={fielddata[name]}
-                rows={rows}
-                onHandleChange={handleChange}
-              ></InputBox>
-            )
+            <TextBox
+              key={name}
+              name={name}
+              label={field.label}
+              type={field.type ? field.type : "text"}
+              required={field.required === undefined ? true : field.required}
+              value={fieldData[name]}
+              rows={!field.rows ? "3" : field.rows}
+              onHandleChange={handleChange}
+            ></TextBox>
           );
         })}
         {imageYes && (
@@ -261,8 +266,8 @@ function FormDetails({entity, id, imageYes}) {
             })}
           </>
         )}
-      </form>
-    </>
+      </div>
+    </div>
   );
 }
 export default FormDetails;
