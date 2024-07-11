@@ -8,8 +8,8 @@ import CheckBox from "./CheckBox.jsx";
 import EditMenu from "./EditMenu.jsx";
 import {toastSuccess} from "./toastSwal/ToastMessages.js";
 
-function ListItems({entity, url, imageYes}) {
-  // entity > {name:"artist",label:"Artiste",labels:"Artistes"} ,
+function ListItems({entity, url}) {
+  // entity > {name:"artist",label:"Artiste",labels:"Artistes",imageYes}
   const contextSelection = useContext(SelectionContext);
   const contextImages = useContext(ImagesContext);
   const abortController = new AbortController();
@@ -34,8 +34,13 @@ function ListItems({entity, url, imageYes}) {
     };
   }, [entity]);
   async function handleDelete(id) {
-    const {data: res} = await deleteEntity(id, null, abortController.signal); //associated images (if any) deleted as well
-    if (imageYes)
+    const {data: res} = await deleteEntity(
+      entity.name,
+      id,
+      null,
+      abortController.signal
+    ); //associated images (if any) deleted as well
+    if (entity.imageYes)
       contextImages.onHandleImages(res.data.images_id, null, "remove");
     contextSelection.onHandleSelected(entity.name, -1, false);
     setItems(

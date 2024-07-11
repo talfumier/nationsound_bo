@@ -1,0 +1,88 @@
+{
+  "artist": {
+    "entity": {
+      "name": "artist",
+      "label": "Artiste",
+      "labels": "Artistes",
+      "imageYes": true
+    },
+    "fields": [
+      {
+        "label": "Nom du groupe",
+        "name": "name",
+        "type": "textarea"
+      },
+      {
+        "name": "country",
+        "label": "Pays d'origine",
+        "rows": "1",
+        "type": "textarea"
+      },
+      {
+        "label": "Style",
+        "type": "textarea"
+      },
+      {
+        "label": "Description",
+        "rows": "5",
+        "type": "textarea"
+      },
+      {
+        "label": "Albums",
+        "required": false,
+        "rows": "5",
+        "type": "textarea"
+      },
+      {
+        "label": "Composition",
+        "rows": "5",
+        "type": "textarea"
+      }
+    ]
+  },
+  "partner": {
+    "entity": {
+      "name": "partner",
+      "label": "Partenaire",
+      "labels": "Partenaires",
+      "imageYes": true
+    },
+    "fields": [
+      {
+        "label": "Nom du partenaire",
+        "name": "name",
+        "type": "textarea"
+      }
+    ]
+  },
+  "transport": {
+    "entity": {
+      "name": "transport",
+      "label": "Moyen de transport",
+      "labels": "Transports",
+      "imageYes": false
+    },
+    "fields": [
+      {
+        "label": "Désignation",
+        "name": "name",
+        "rows": 2,
+        "type": "textarea"
+      },
+      {
+        "label": "Moyen de transport",
+        "name": "transport_mean",
+        "type": "select",
+        "options": [
+          ["car", "voiture"],
+          ["train", "train"],
+          ["plane", "avion"]
+        ]
+      },
+      {
+        "label": "Description",
+        "type": "textarea"
+      }
+    ]
+  }
+}

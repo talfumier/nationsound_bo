@@ -7,7 +7,7 @@ import ImagesContext from "../../services/context/ImagesContext.js";
 import {fillUpContainer} from "./utilityFunctions.js";
 import PageHeader from "./PageHeader.jsx";
 import Toolbar from "./Toolbar.jsx";
-import TextBox from "./TextBox.jsx";
+import TextInput from "./TextInput.jsx";
 import ImageUnit from "./ImageUnit.jsx";
 import {range} from "./utilityFunctions.js";
 import {toastSuccess, toastWarning} from "./toastSwal/ToastMessages.js";
@@ -23,7 +23,8 @@ let updatedData = {},
   updatedImages = [],
   formValid = {};
 
-function FormDetails({entity, fields, imageYes}) {
+function FormDetails({entity, fields}) {
+  // entity > {name:"artist",label:"Artiste",labels:"Artistes",imageYes}
   const {id} = useParams(); //route parameter
   const location = useLocation();
   const abortController = new AbortController();
@@ -76,7 +77,7 @@ function FormDetails({entity, fields, imageYes}) {
         }
       }
     }
-    if (imageYes) loadContainer(fieldData.images_id, signal);
+    if (entity.imageYes) loadContainer(fieldData.images_id, signal);
   }, [reset, contextImages.containers, fieldData.images_id]);
   /* CLEAN UP */
   useEffect(() => {
@@ -113,7 +114,7 @@ function FormDetails({entity, fields, imageYes}) {
   }
   function handleUndo() {
     setFieldData({});
-    if (imageYes) setImages(fillUpContainer({_id: null, images: []}));
+    if (entity.imageYes) setImages(fillUpContainer({_id: null, images: []}));
     setReset(reset + 1);
     setStatus({save: false});
     resetChangeMonitor();
@@ -191,7 +192,8 @@ function FormDetails({entity, fields, imageYes}) {
     /* ARTIST DATA PROCESSING */
     if (Object.keys(updatedData).length > 0) {
       if (id == -1) {
-        if (imageYes && !updatedData.images_id) updatedData.images_id = null;
+        if (entity.imageYes && !updatedData.images_id)
+          updatedData.images_id = null;
         const {data: res} = await postEntity(
           entity.name,
           updatedData,
@@ -204,7 +206,7 @@ function FormDetails({entity, fields, imageYes}) {
       setFieldData({...fieldData, ...updatedData}); //update fieldData local state
     }
 
-    if (imageYes) setImages(imgs); //update images local state
+    if (entity.imageYes) setImages(imgs); //update images local state
     setStatus({...toolbarStatus, save: false});
     toastSuccess(
       `${entity.label} '${{...fieldData, ...updatedData}.name}' ${
@@ -218,7 +220,7 @@ function FormDetails({entity, fields, imageYes}) {
     updatedImages = [];
   }
   return (
-    <div className="page-container">
+    <div className={`page-container ${entity.name}`}>
       <PageHeader
         title={`${entity.labels}`}
         len={location.state.len}
@@ -234,19 +236,20 @@ function FormDetails({entity, fields, imageYes}) {
         {fields.map((field) => {
           const name = !field.name ? field.label.toLowerCase() : field.name;
           return (
-            <TextBox
+            <TextInput
               key={name}
               name={name}
               label={field.label}
-              type={field.type ? field.type : "text"}
+              type={field.type}
               required={field.required === undefined ? true : field.required}
               value={fieldData[name]}
               rows={!field.rows ? "3" : field.rows}
+              options={field.type !== "select" ? null : field.options}
               onHandleChange={handleChange}
-            ></TextBox>
+            ></TextInput>
           );
         })}
-        {imageYes && (
+        {entity.imageYes && (
           <>
             <label className="images-label">Photos</label>
             {range(0, 2).map((idx) => {

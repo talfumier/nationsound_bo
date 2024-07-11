@@ -24,7 +24,7 @@ function NavBar() {
       <NavLink to="/partners">
         <p>Partenaires</p>
       </NavLink>
-      <NavLink to="/transport">
+      <NavLink to="/transports">
         <p>Transport</p>
       </NavLink>
       <NavLink to="/faqs">

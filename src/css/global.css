@@ -132,7 +132,7 @@ div.app-main-content {
   grid-column: 2;
   display:grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 60px 15px 35px auto;
+  grid-template-rows: 60px 15px 35px 15px auto;
   background-color: var(--grey-light);
   padding: 10px 20px;
 }
@@ -141,7 +141,7 @@ div.app-main-content {
 }
 @media (min-width:460px) {
   .page-container {
-    grid-template-rows: 40px 15px 35px auto;
+    grid-template-rows: 40px 15px 35px 15px auto;
   }
   .page-container.list {
     grid-template-rows: 40px 15px 0 auto;
@@ -252,8 +252,16 @@ div.product-details {
   div.product-details {
     gap: 0 20px;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: max(120px) max(150px) max(30px) max(350px);
     padding-bottom: 30px;
+  }
+  div.product-details.artist {
+    grid-template-rows: max(120px) max(150px) max(30px) max(350px);
+  }
+  div.product-details.partner {
+    grid-template-rows: max(120px) max(30px) max(350px);
+  }
+  div.product-details.transport {
+    grid-template-rows: max(120px) max(30px) auto;
   }
 }
 div.image-container {
@@ -321,7 +329,7 @@ div.page-not-found h2 {
   line-height: 5rem;
 }
 /* FORM CONTROLS */
-div.textarea {
+div.input-container {
   display:flex;
   flex-direction: column;
   font-size: 1.7rem;
@@ -329,19 +337,24 @@ div.textarea {
   border:none;
   max-width:300px;
 }
-div.textarea textarea {
+div.input-container textarea, 
+div.input-container select {
   padding:5px;
   border: solid 1px grey;
   border-radius: 5px;
   resize: vertical;
 }
-div.textarea textarea.valid {
+div.input-container select {
+  cursor: pointer;
+}
+div.input-container .valid {
   border-color: green;
 }
-div.textarea textarea.not-valid {
+div.input-container .not-valid {
   border-color:red;
 }
-div.textarea textarea:focus {
+div.input-container textarea:focus, 
+div.input-container select:focus {
   outline: none ;
   box-shadow: 0 0 10px #719ECE;
 }

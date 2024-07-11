@@ -1,7 +1,7 @@
 import {useState, useEffect} from "react";
 import {arrayBufferToWebP} from "webp-converter-browser";
 import {toDate} from "date-fns";
-import TextField from "./TextField.jsx";
+import TextBox from "./TextBox.jsx";
 import {fileSize, getEmptyImage, getFormattedDate} from "./utilityFunctions.js";
 import config from "../../config.json";
 import {toastError} from "./toastSwal/ToastMessages.js";
@@ -104,11 +104,11 @@ function ImageUnit({idx, dataIn, onHandleChange, onHandleMain}) {
       <div className="file-details">
         {textfields.map((item, i) => {
           return (
-            <TextField
+            <TextBox
               key={i}
               label={item.label}
               value={displayData(item.name)}
-            ></TextField>
+            ></TextBox>
           );
         })}
       </div>
