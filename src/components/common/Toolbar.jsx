@@ -5,7 +5,6 @@ function Toolbar({status, onHandleSave, onHandleUndo}) {
   const [width, setWidth] = useState(window.innerWidth);
   useEffect(() => {
     function handleResize() {
-      console.log(window.innerWidth);
       setWidth(window.innerWidth);
     }
     window.addEventListener("resize", handleResize);

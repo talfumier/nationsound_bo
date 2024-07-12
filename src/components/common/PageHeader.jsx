@@ -26,16 +26,18 @@ function PageHeader({title, len, url}) {
         {title}
         <span>{len}</span>
       </h2>
-      {url && (
-        <NavLink
-          className="btn btn-info"
-          to={{pathname: `${url}/-1`}}
-          state={{data: null, len: len + 1}}
-        >
-          <i className="fa-solid fa-plus fa-1x"></i>
-          <span>Ajouter</span>
-        </NavLink>
-      )}
+      {url && url.includes("dates")
+        ? len === 0
+        : true && (
+            <NavLink
+              className="btn btn-info"
+              to={{pathname: `${url}/-1`}}
+              state={{data: null, len: len + 1}}
+            >
+              <i className="fa-solid fa-plus fa-1x"></i>
+              <span>Ajouter</span>
+            </NavLink>
+          )}
     </div>
   );
 }

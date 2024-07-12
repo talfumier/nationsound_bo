@@ -44,7 +44,12 @@ function App() {
     setContainers(arr);
   }
   // common forms' definition in formContent.json file > ListItems, FormDetails
-  // default values when missing property: required > true, rows > 3, name > label.toLowerCase()
+  // default values when missing property: required > true, rows > 3
+  function getMaster(fields) {
+    return _.filter(fields, (item) => {
+      return item.listMaster;
+    });
+  }
   return (
     <>
       <Header></Header>
@@ -62,6 +67,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Home></Home>}></Route>
                   {Object.keys(formContent).map((key) => {
+                    let master = getMaster(formContent[key].fields);
                     return (
                       <Fragment key={key}>
                         <Route
@@ -69,6 +75,7 @@ function App() {
                           element={
                             <ListItems
                               entity={formContent[key].entity}
+                              master={master}
                               url={`/${key}s`}
                             ></ListItems>
                           }
@@ -78,6 +85,7 @@ function App() {
                           element={
                             <FormDetails
                               entity={formContent[key].entity}
+                              master={master[0].name}
                               fields={formContent[key].fields}
                             ></FormDetails>
                           }

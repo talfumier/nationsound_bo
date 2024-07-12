@@ -2,9 +2,10 @@ import {useEffect, useState, useContext} from "react";
 import {useLocation} from "react-router-dom";
 import {useParams} from "react-router-dom";
 import _ from "lodash";
+import {isDate} from "date-fns";
 import SelectionContext from "../../services/context/SelectionContext.js";
 import ImagesContext from "../../services/context/ImagesContext.js";
-import {fillUpContainer} from "./utilityFunctions.js";
+import {fillUpContainer, getFormattedDate} from "./utilityFunctions.js";
 import PageHeader from "./PageHeader.jsx";
 import Toolbar from "./Toolbar.jsx";
 import TextInput from "./TextInput.jsx";
@@ -23,7 +24,7 @@ let updatedData = {},
   updatedImages = [],
   formValid = {};
 
-function FormDetails({entity, fields}) {
+function FormDetails({entity, master, fields}) {
   // entity > {name:"artist",label:"Artiste",labels:"Artistes",imageYes}
   const {id} = useParams(); //route parameter
   const location = useLocation();
@@ -49,8 +50,7 @@ function FormDetails({entity, fields}) {
     function initEmpty() {
       const obj = {};
       fields.map((field) => {
-        let name = !field.name ? field.label.toLowerCase() : field.name;
-        obj[name] = "";
+        obj[field.name] = "";
       });
       obj.images_id = null;
       return obj;
@@ -101,7 +101,16 @@ function FormDetails({entity, fields}) {
         }
         break;
       default: // fields
-        if (value !== fieldData[name]) updatedData[name] = value;
+        const date = isDate(value);
+        if (
+          !date
+            ? value
+            : new Date(value).setHours(0, 0, 0, 0) !==
+              (!date
+                ? fieldData[name]
+                : new Date(fieldData[name]).setHours(0, 0, 0, 0))
+        )
+          updatedData[name] = value;
         else delete updatedData[name];
     }
     const status = {...toolbarStatus};
@@ -189,7 +198,7 @@ function FormDetails({entity, fields}) {
         updatedData.images_id = res.data._id;
       }
     }
-    /* ARTIST DATA PROCESSING */
+    /* FIELD DATA PROCESSING */
     if (Object.keys(updatedData).length > 0) {
       if (id == -1) {
         if (entity.imageYes && !updatedData.images_id)
@@ -209,7 +218,7 @@ function FormDetails({entity, fields}) {
     if (entity.imageYes) setImages(imgs); //update images local state
     setStatus({...toolbarStatus, save: false});
     toastSuccess(
-      `${entity.label} '${{...fieldData, ...updatedData}.name}' ${
+      `${entity.label} '${{...fieldData, ...updatedData}[master]}' ${
         id == -1 ? "créé" : "mis à jour"
       } avec succès !`
     );
@@ -220,7 +229,7 @@ function FormDetails({entity, fields}) {
     updatedImages = [];
   }
   return (
-    <div className={`page-container ${entity.name}`}>
+    <div className={`page-container`}>
       <PageHeader
         title={`${entity.labels}`}
         len={location.state.len}
@@ -234,17 +243,18 @@ function FormDetails({entity, fields}) {
       <hr />
       <div className={`product-details ${entity.name}`}>
         {fields.map((field) => {
-          const name = !field.name ? field.label.toLowerCase() : field.name;
           return (
             <TextInput
-              key={name}
-              name={name}
+              key={field.name}
+              name={field.name}
               label={field.label}
               type={field.type}
               required={field.required === undefined ? true : field.required}
-              value={fieldData[name]}
+              value={fieldData[field.name]}
               rows={!field.rows ? "3" : field.rows}
               options={field.type !== "select" ? null : field.options}
+              placeholder={field.placeholder ? field.placeholder : null}
+              format={field.format ? field.format : "text"}
               onHandleChange={handleChange}
             ></TextInput>
           );

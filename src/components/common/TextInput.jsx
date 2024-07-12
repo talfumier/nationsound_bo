@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import {isValidDate, strToDate, getFormattedDate} from "./utilityFunctions";
 
 function TextInput({
   name,
@@ -8,22 +9,44 @@ function TextInput({
   value,
   rows,
   options,
+  placeholder,
+  format,
   onHandleChange,
 }) {
   const [data, setData] = useState("");
   const [dirty, setDirty] = useState(false);
-  const [fieldValid, setFieldValid] = useState(true);
+  const [fieldValid, setFieldValid] = useState({valid: true, msg: null});
   useEffect(() => {
-    setData(value);
-    if (required) setFieldValid(validate(value));
+    const dta =
+      format === "date" ? getFormattedDate(value, "dd.MM.yyyy") : value;
+    setData(dta);
+    if (required) setFieldValid({valid: validate(dta).valid, msg: null});
   }, [value]);
 
   function validate(value) {
-    let result = true;
-    switch (type) {
-      case "textarea":
-        if (!value || value.length === 0) result = false;
+    if (!value || value.length === 0)
+      return {
+        valid: false,
+        msg: (
+          <span>
+            Valeur <strong>non nulle</strong> obligatoire !
+          </span>
+        ),
+      };
+    let result = {valid: true, msg: null};
+    switch (format) {
+      case "text":
         break;
+      case "date":
+        if (!isValidDate(value))
+          result = {
+            valid: false,
+            msg: (
+              <span>
+                Format <strong>jj.mm.aaaa</strong> non respecté !
+              </span>
+            ),
+          };
     }
     return result;
   }
@@ -33,13 +56,18 @@ function TextInput({
       {type === "textarea" && (
         <textarea
           className={`text ${fieldValid ? "valid" : "not-valid"}`}
+          placeholder={placeholder}
           value={data}
           onChange={(e) => {
             setDirty(true);
             setData(e.target.value);
-            let valid = true;
-            if (required && !validate(e.target.value)) valid = false;
-            onHandleChange(name, valid, e.target.value);
+            let valid = {valid: true, msg: null};
+            if (required) valid = validate(e.target.value);
+            onHandleChange(
+              name,
+              valid.valid,
+              format !== "date" ? e.target.value : strToDate(e.target.value)
+            );
             setFieldValid(valid);
           }}
           rows={rows}
@@ -52,7 +80,7 @@ function TextInput({
             setDirty(true);
             setData(e.target.value);
             onHandleChange(name, true, e.target.value);
-            setFieldValid(true);
+            setFieldValid({valid: true, msg: null});
           }}
           value={data}
         >
@@ -65,8 +93,8 @@ function TextInput({
           })}
         </select>
       )}
-      {dirty && !fieldValid && (
-        <div className="alert">Une valeur non nulle est obligatoire !</div>
+      {dirty && !fieldValid.valid && (
+        <div className="alert">{fieldValid.msg}</div>
       )}
     </div>
   );

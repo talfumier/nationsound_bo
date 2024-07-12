@@ -8,9 +8,10 @@
     },
     "fields": [
       {
-        "label": "Nom du groupe",
         "name": "name",
-        "type": "textarea"
+        "label": "Nom du groupe",
+        "type": "textarea",
+        "listMaster": true
       },
       {
         "name": "country",
@@ -19,21 +20,25 @@
         "type": "textarea"
       },
       {
+        "name": "style",
         "label": "Style",
         "type": "textarea"
       },
       {
+        "name": "description",
         "label": "Description",
         "rows": "5",
         "type": "textarea"
       },
       {
+        "name": "albums",
         "label": "Albums",
         "required": false,
         "rows": "5",
         "type": "textarea"
       },
       {
+        "name": "composition",
         "label": "Composition",
         "rows": "5",
         "type": "textarea"
@@ -49,9 +54,10 @@
     },
     "fields": [
       {
-        "label": "Nom du partenaire",
         "name": "name",
-        "type": "textarea"
+        "label": "Nom du partenaire",
+        "type": "textarea",
+        "listMaster": true
       }
     ]
   },
@@ -64,14 +70,15 @@
     },
     "fields": [
       {
-        "label": "Désignation",
         "name": "name",
+        "label": "Désignation",
         "rows": 2,
-        "type": "textarea"
+        "type": "textarea",
+        "listMaster": true
       },
       {
-        "label": "Moyen de transport",
         "name": "transport_mean",
+        "label": "Moyen de transport",
         "type": "select",
         "options": [
           ["car", "voiture"],
@@ -80,8 +87,164 @@
         ]
       },
       {
+        "name": "description",
         "label": "Description",
         "type": "textarea"
+      }
+    ]
+  },
+  "faq": {
+    "entity": {
+      "name": "faq",
+      "label": "FAQ",
+      "labels": "FAQ",
+      "imageYes": false
+    },
+    "fields": [
+      {
+        "name": "question",
+        "label": "Question",
+        "type": "textarea",
+        "rows": 8,
+        "listMaster": true
+      },
+      {
+        "name": "answer",
+        "label": "Réponse",
+        "type": "textarea",
+        "rows": 8
+      }
+    ]
+  },
+  "message": {
+    "entity": {
+      "name": "message",
+      "label": "Message",
+      "labels": "Messages",
+      "imageYes": false
+    },
+    "fields": [
+      {
+        "name": "title",
+        "label": "Sujet",
+        "type": "textarea",
+        "rows": 2,
+        "listMaster": true
+      },
+      {
+        "name": "active",
+        "label": "Visibilité",
+        "type": "select",
+        "options": [
+          [true, "visible en ligne"],
+          [false, "non visible"]
+        ]
+      },
+      {
+        "name": "text",
+        "label": "Texte",
+        "type": "textarea",
+        "rows": 5
+      },
+      {
+        "name": "criticality",
+        "label": "Degré d'urgence",
+        "type": "select",
+        "options": [
+          ["info", "information"],
+          ["warning", "avertissement"],
+          ["critical", "urgence"]
+        ]
+      },
+      {
+        "name": "order",
+        "label": "Ordre d'affichage",
+        "type": "textarea",
+        "rows": "1"
+      }
+    ]
+  },
+  "poi": {
+    "entity": {
+      "name": "poi",
+      "label": "Lieu",
+      "labels": "Lieux",
+      "imageYes": false
+    },
+    "fields": [
+      {
+        "name": "name",
+        "label": "Lieu",
+        "type": "textarea",
+        "rows": 2,
+        "listMaster": true
+      },
+      {
+        "name": "type",
+        "label": "Catégorie",
+        "type": "select",
+        "options": [
+          ["stage", "scène de concert"],
+          ["meeting", "zone de rencontre et d'activités"]
+        ]
+      }
+    ]
+  },
+  "date": {
+    "entity": {
+      "name": "date",
+      "label": "Date",
+      "labels": "Dates",
+      "imageYes": false
+    },
+    "fields": [
+      {
+        "name": "start_date",
+        "label": "Début",
+        "type": "textarea",
+        "placeholder": "Date au format jj/mm/aaaa",
+        "format": "date",
+        "rows": 2,
+        "listMaster": true
+      },
+      {
+        "name": "end_date",
+        "label": "Fin",
+        "type": "textarea",
+        "placeholder": "Date au format jj/mm/aaaa",
+        "format": "date",
+        "rows": 2,
+        "listMaster": true
+      },
+      {
+        "name": "opening_hours",
+        "label": "Heures d'ouverture au public",
+        "type": "textarea",
+        "rows": 2
+      },
+      {
+        "name": "street",
+        "label": "Adresse",
+        "type": "textarea",
+        "rows": 6
+      },
+      {
+        "name": "city",
+        "label": "Ville",
+        "type": "textarea",
+        "rows": 3
+      },
+      {
+        "name": "lat",
+        "label": "Latitude",
+        "type": "textarea",
+        "rows": 1
+      },
+      {
+        "name": "lng",
+        "label": "Longitude",
+        "type": "textarea",
+        "rows": 1
       }
     ]
   }

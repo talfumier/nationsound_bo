@@ -7,8 +7,9 @@ import PageHeader from "./PageHeader.jsx";
 import CheckBox from "./CheckBox.jsx";
 import EditMenu from "./EditMenu.jsx";
 import {toastSuccess} from "./toastSwal/ToastMessages.js";
+import {getFormattedDate} from "./utilityFunctions.js";
 
-function ListItems({entity, url}) {
+function ListItems({entity, master, url}) {
   // entity > {name:"artist",label:"Artiste",labels:"Artistes",imageYes}
   const contextSelection = useContext(SelectionContext);
   const contextImages = useContext(ImagesContext);
@@ -48,7 +49,29 @@ function ListItems({entity, url}) {
         return item.id !== id;
       })
     );
-    toastSuccess(`${entity.label} '${res.data.name}' supprimé avec succès !`);
+    toastSuccess(
+      `${entity.label} '${res.data[master[0]]}' supprimé avec succès !`
+    );
+  }
+  function getLabel(item) {
+    if (!url.includes("date")) return item[master[0].name];
+    return (
+      <div>
+        <strong>
+          <span>{getFormattedDate(item[master[0].name], "dd.MM.yyyy")}</span>
+          {master[1] && (
+            <>
+              <span>&nbsp;&nbsp;</span>
+              <span>{" >>> "}</span>
+              <span>&nbsp;&nbsp;</span>
+              <span>
+                {getFormattedDate(item[master[1].name], "dd.MM.yyyy")}
+              </span>
+            </>
+          )}
+        </strong>
+      </div>
+    );
   }
   return (
     <div className="page-container list">
@@ -59,11 +82,11 @@ function ListItems({entity, url}) {
       ></PageHeader>
       <hr />
       <div className="list-container">
-        {items.map((item) => {
+        {items.map((item, idx) => {
           return (
             <div key={item.id} className="list-item">
               <CheckBox
-                label={item.name}
+                label={getLabel(item)}
                 value={item.active ? item.active : false}
                 onHandleChange={(ckd) => {
                   const data = [...items];
