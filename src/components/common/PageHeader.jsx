@@ -1,8 +1,17 @@
-import {useNavigate, NavLink} from "react-router-dom";
+import {useNavigate, NavLink, useLocation} from "react-router-dom";
 import {Tooltip} from "react-tooltip";
 
-function PageHeader({title, len, url}) {
+function PageHeader({title, len, url, data}) {
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const cond = () => {
+    const path = url ? url : location.pathname;
+    if (path.length === 0) return false;
+    if (path.split("/").length >= 3) return false;
+    if (path.includes("dates")) return len === 0;
+    return true;
+  };
   return (
     <div className="page-header">
       <a className="tooltip-anchor-back">
@@ -26,18 +35,16 @@ function PageHeader({title, len, url}) {
         {title}
         <span>{len}</span>
       </h2>
-      {url && url.includes("dates")
-        ? len === 0
-        : true && (
-            <NavLink
-              className="btn btn-info"
-              to={{pathname: `${url}/-1`}}
-              state={{data: null, len: len + 1}}
-            >
-              <i className="fa-solid fa-plus fa-1x"></i>
-              <span>Ajouter</span>
-            </NavLink>
-          )}
+      {cond() && (
+        <NavLink
+          className="btn btn-info"
+          to={{pathname: location.pathname + "/-1"}}
+          state={{comboData: data, len: len + 1}}
+        >
+          <i className="fa-solid fa-plus fa-1x"></i>
+          <span>Ajouter</span>
+        </NavLink>
+      )}
     </div>
   );
 }

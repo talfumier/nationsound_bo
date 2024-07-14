@@ -16,18 +16,35 @@ function ListItems({entity, master, url}) {
   const abortController = new AbortController();
 
   const [items, setItems] = useState([]);
+  const [comboData, setComboData] = useState({artists: [], pois: []});
   useEffect(() => {
     async function loadData(signal) {
-      const {data: res} = await getEntities(entity.name, null, signal);
-      setItems(
-        res.data.map((item) => {
-          return {
-            ...item,
-            active:
-              contextSelection.selected[entity.name] === item.id ? true : false,
-          };
-        })
-      );
+      try {
+        const {data: res} = await getEntities(entity.name, null, signal);
+        setItems(
+          _.orderBy(
+            res.data.map((item) => {
+              return {
+                ...item,
+                active:
+                  contextSelection.selected[entity.name] === item.id
+                    ? true
+                    : false,
+              };
+            }),
+            [entity.orderBy.field],
+            [entity.orderBy.order]
+          )
+        );
+        //load artists and pois data
+        if (entity.name === "event") {
+          const {data: res1} = await getEntities("artist", null, signal);
+          const {data: res2} = await getEntities("poi", null, signal);
+          setComboData({artists: res1.data, pois: res2.data});
+        }
+      } catch (error) {
+        //catching errors handled by axios interceptors in httpService.js
+      }
     }
     loadData(abortController.signal);
     return () => {
@@ -35,43 +52,57 @@ function ListItems({entity, master, url}) {
     };
   }, [entity]);
   async function handleDelete(id) {
-    const {data: res} = await deleteEntity(
-      entity.name,
-      id,
-      null,
-      abortController.signal
-    ); //associated images (if any) deleted as well
-    if (entity.imageYes)
-      contextImages.onHandleImages(res.data.images_id, null, "remove");
-    contextSelection.onHandleSelected(entity.name, -1, false);
-    setItems(
-      _.filter(items, (item) => {
-        return item.id !== id;
-      })
-    );
-    toastSuccess(
-      `${entity.label} '${res.data[master[0]]}' supprimé avec succès !`
-    );
+    try {
+      const {data: res} = await deleteEntity(
+        entity.name,
+        id,
+        null,
+        abortController.signal
+      ); //associated images (if any) deleted as well
+      if (entity.imageYes)
+        contextImages.onHandleImages(res.data.images_id, null, "remove");
+      contextSelection.onHandleSelected(entity.name, -1, false);
+      setItems(
+        _.filter(items, (item) => {
+          return item.id !== id;
+        })
+      );
+      toastSuccess(`${entity.label} supprimé avec succès !`);
+    } catch (error) {
+      //catching errors handled by axios interceptors in httpService.js
+    }
   }
   function getLabel(item) {
-    if (!url.includes("date")) return item[master[0].name];
-    return (
-      <div>
-        <strong>
+    if (url.includes("date"))
+      return (
+        <div>
           <span>{getFormattedDate(item[master[0].name], "dd.MM.yyyy")}</span>
-          {master[1] && (
-            <>
-              <span>&nbsp;&nbsp;</span>
-              <span>{" >>> "}</span>
-              <span>&nbsp;&nbsp;</span>
-              <span>
-                {getFormattedDate(item[master[1].name], "dd.MM.yyyy")}
-              </span>
-            </>
-          )}
-        </strong>
-      </div>
-    );
+          <span>&nbsp;&nbsp;{" >>> "}&nbsp;&nbsp;</span>
+          <span>{getFormattedDate(item[master[1].name], "dd.MM.yyyy")}</span>
+        </div>
+      );
+    if (url.includes("event")) {
+      const artist = _.filter(comboData.artists, (row) => {
+        return row.id === item.performer;
+      })[0];
+      const poi = _.filter(comboData.pois, (row) => {
+        return row.id === item.location;
+      })[0];
+      try {
+        return (
+          <div className="event-container">
+            <span>{artist.name}</span>
+            <div className="event-date">
+              <span>{getFormattedDate(item.date, "dd.MM")}</span>{" "}
+              <span>{getFormattedDate(item.date, "HH:mm")}</span>
+            </div>
+            <span className={`event-type ${item.type}`}>{item.type}</span>
+            <span className={`event-location ${poi.type}`}>{poi.name}</span>
+          </div>
+        );
+      } catch (error) {}
+    }
+    return item[master[0].name];
   }
   return (
     <div className="page-container list">
@@ -79,6 +110,7 @@ function ListItems({entity, master, url}) {
         title={`${entity.labels}`}
         len={items.length}
         url={url}
+        data={comboData}
       ></PageHeader>
       <hr />
       <div className="list-container">
@@ -99,7 +131,7 @@ function ListItems({entity, master, url}) {
               ></CheckBox>
               <EditMenu
                 url={url}
-                data={{entity, data: item, len: items.length}}
+                data={{entity, data: item, len: items.length, comboData}}
                 onHandleDelete={() => {
                   handleDelete(item.id);
                 }}

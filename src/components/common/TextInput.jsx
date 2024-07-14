@@ -1,5 +1,10 @@
 import {useEffect, useState} from "react";
-import {isValidDate, strToDate, getFormattedDate} from "./utilityFunctions";
+import {
+  isValidDate,
+  strToDate,
+  getFormattedDate,
+  isValidDateTime,
+} from "./utilityFunctions";
 
 function TextInput({
   name,
@@ -17,8 +22,15 @@ function TextInput({
   const [dirty, setDirty] = useState(false);
   const [fieldValid, setFieldValid] = useState({valid: true, msg: null});
   useEffect(() => {
-    const dta =
-      format === "date" ? getFormattedDate(value, "dd.MM.yyyy") : value;
+    let fmt = null;
+    switch (format) {
+      case "date":
+        fmt = "dd.MM.yyyy";
+        break;
+      case "date-time":
+        fmt = "dd.MM.yyyy HH:mm";
+    }
+    const dta = fmt ? getFormattedDate(value, fmt) : value;
     setData(dta);
     if (required) setFieldValid({valid: validate(dta).valid, msg: null});
   }, [value]);
@@ -43,10 +55,22 @@ function TextInput({
             valid: false,
             msg: (
               <span>
-                Format <strong>jj.mm.aaaa</strong> non respecté !
+                Format <strong>jj.MM.aaaa</strong> non respecté !
               </span>
             ),
           };
+        break;
+      case "date-time":
+        if (!isValidDateTime(value))
+          result = {
+            valid: false,
+            msg: (
+              <span>
+                Format <strong>jj.MM.aaaa HH.mm</strong> non respecté !
+              </span>
+            ),
+          };
+        break;
     }
     return result;
   }
@@ -66,7 +90,9 @@ function TextInput({
             onHandleChange(
               name,
               valid.valid,
-              format !== "date" ? e.target.value : strToDate(e.target.value)
+              format !== "date" && format !== "date-time"
+                ? e.target.value
+                : strToDate(e.target.value)
             );
             setFieldValid(valid);
           }}
@@ -84,6 +110,9 @@ function TextInput({
           }}
           value={data}
         >
+          <option key={-1} className="option" value="null" hidden>
+            Choisir un élément de la liste
+          </option>
           {options.map((option, idx) => {
             return (
               <option key={idx} className="option" value={option[0]}>

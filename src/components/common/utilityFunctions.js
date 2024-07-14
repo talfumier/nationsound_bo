@@ -1,8 +1,11 @@
 import {parseISO, format, isDate} from "date-fns";
 import _ from "lodash";
 export function strToDate(str) {
-  const arr = str.split(".");
-  return new Date(`${arr[2]}/${arr[1]}/${arr[0]}`);
+  let arr = str.split(" ");
+  arr = [...arr[0].split("."), ...(arr[1] ? arr[1].split(":") : [])];
+  let result = `${arr[2]}/${arr[1]}/${arr[0]}`;
+  if (arr[3]) result = result + ` ${arr[3]}:${arr[4]}`;
+  return new Date(result);
 }
 export function isValidDate(str) {
   const arr = str.split(".");
@@ -10,6 +13,20 @@ export function isValidDate(str) {
   if (arr[0].length !== 2 || arr[1].length !== 2 || arr[2].length !== 4)
     return false;
   return !isNaN(new Date(`${arr[2]}/${arr[1]}/${arr[0]}`));
+}
+function isValidTime(str) {
+  const arr = str.split(":");
+  if (arr.length !== 2) return false;
+  if (arr[0].length !== 2 || arr[1].length !== 2) return false;
+  return true;
+}
+export function isValidDateTime(str) {
+  let arr = str.split(" ");
+  if (arr.length !== 2) return false;
+  if (!isValidDate(arr[0])) return false;
+  if (!isValidTime(arr[1])) return false;
+  arr = [...arr[0].split("."), ...arr[1].split(":")];
+  return !isNaN(new Date(`${arr[2]}/${arr[1]}/${arr[0]} ${arr[3]}:${arr[4]}`));
 }
 export function getFormattedDate(date, frmt) {
   if (typeof frmt === "undefined") frmt = "dd.MM.yyyy HH:mm";

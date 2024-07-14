@@ -85,7 +85,6 @@ function App() {
                           element={
                             <FormDetails
                               entity={formContent[key].entity}
-                              master={master[0].name}
                               fields={formContent[key].fields}
                             ></FormDetails>
                           }

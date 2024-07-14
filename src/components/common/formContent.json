@@ -4,6 +4,7 @@
       "name": "artist",
       "label": "Artiste",
       "labels": "Artistes",
+      "orderBy": {"field": "name", "order": "asc"},
       "imageYes": true
     },
     "fields": [
@@ -50,6 +51,7 @@
       "name": "partner",
       "label": "Partenaire",
       "labels": "Partenaires",
+      "orderBy": {"field": "name", "order": "asc"},
       "imageYes": true
     },
     "fields": [
@@ -66,6 +68,7 @@
       "name": "transport",
       "label": "Moyen de transport",
       "labels": "Transports",
+      "orderBy": {"field": "name", "order": "asc"},
       "imageYes": false
     },
     "fields": [
@@ -98,6 +101,7 @@
       "name": "faq",
       "label": "FAQ",
       "labels": "FAQ",
+      "orderBy": {"field": "question", "order": "asc"},
       "imageYes": false
     },
     "fields": [
@@ -121,6 +125,7 @@
       "name": "message",
       "label": "Message",
       "labels": "Messages",
+      "orderBy": {"field": "title", "order": "asc"},
       "imageYes": false
     },
     "fields": [
@@ -169,6 +174,7 @@
       "name": "poi",
       "label": "Lieu",
       "labels": "Lieux",
+      "orderBy": {"field": "name", "order": "asc"},
       "imageYes": false
     },
     "fields": [
@@ -195,6 +201,7 @@
       "name": "date",
       "label": "Date",
       "labels": "Dates",
+      "orderBy": {"field": "start_date", "order": "asc"},
       "imageYes": false
     },
     "fields": [
@@ -202,7 +209,7 @@
         "name": "start_date",
         "label": "Début",
         "type": "textarea",
-        "placeholder": "Date au format jj/mm/aaaa",
+        "placeholder": "jj.mm.aaaa",
         "format": "date",
         "rows": 2,
         "listMaster": true
@@ -211,7 +218,7 @@
         "name": "end_date",
         "label": "Fin",
         "type": "textarea",
-        "placeholder": "Date au format jj/mm/aaaa",
+        "placeholder": "jj.mm.aaaa",
         "format": "date",
         "rows": 2,
         "listMaster": true
@@ -245,6 +252,49 @@
         "label": "Longitude",
         "type": "textarea",
         "rows": 1
+      }
+    ]
+  },
+  "event": {
+    "entity": {
+      "name": "event",
+      "label": "Evènement",
+      "labels": "Evènements",
+      "orderBy": {"field": "date", "order": "asc"},
+      "imageYes": false
+    },
+    "fields": [
+      {
+        "name": "performer",
+        "label": "Groupe",
+        "type": "select",
+        "options": "artists",
+        "listMaster": true
+      },
+      {
+        "name": "type",
+        "label": "Type",
+        "type": "select",
+        "options": [
+          ["concert", "concert"],
+          ["rencontre", "rencontre"]
+        ],
+        "listMaster": true
+      },
+      {
+        "name": "location",
+        "label": "Lieu",
+        "type": "select",
+        "options": "pois"
+      },
+      {
+        "name": "date",
+        "label": "Date/heure",
+        "type": "textarea",
+        "placeholder": "jj.MM.aaaa HH.mm",
+        "format": "date-time",
+        "rows": 2,
+        "listMaster": true
       }
     ]
   }

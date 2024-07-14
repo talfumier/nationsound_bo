@@ -23,10 +23,10 @@ function Toolbar({status, onHandleSave, onHandleUndo}) {
           content="Revenir à la version enregistrée."
         />
         <button
-          className={`undo-button ${!status.save ? "disabled" : ""}`}
-          disabled={!status.save}
+          className={`undo-button ${!status.undo ? "disabled" : ""}`}
+          disabled={!status.undo}
           onClick={() => {
-            if (status.save) onHandleUndo();
+            if (status.undo) onHandleUndo();
           }}
         >
           <i className="fa-solid fa-arrow-rotate-left fa-3x"></i>

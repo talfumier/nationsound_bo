@@ -1,5 +1,5 @@
 {
   "api_url_dev": "http://localhost:8000/api",
   "api_url_prod": "http://localhost:8000/api",
-  "max_image_size": 2e6
+  "max_image_size": 7e6
 }

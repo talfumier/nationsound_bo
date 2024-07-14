@@ -19,7 +19,7 @@ function NavBar() {
         <p>Artistes</p>
       </NavLink>
       <NavLink to="/events">
-        <p>Planification</p>
+        <p>Programme</p>
       </NavLink>
       <NavLink to="/partners">
         <p>Partenaires</p>
@@ -30,7 +30,7 @@ function NavBar() {
       <NavLink to="/faqs">
         <p>FAQ</p>
       </NavLink>
-      <NavLink to="/faqs">
+      <NavLink to="/medias">
         <p>Media</p>
       </NavLink>
     </nav>

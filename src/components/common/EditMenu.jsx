@@ -3,7 +3,7 @@ import {SwalOkCancel} from "./toastSwal/SwalOkCancel.jsx";
 import {getFormattedDate} from "./utilityFunctions.js";
 
 function EditMenu({url, data: dataIn, onHandleDelete}) {
-  const {entity, data, len} = dataIn;
+  const {data, len, comboData} = dataIn;
   return (
     <div className="edit-menu-container">
       {data.active && (
@@ -12,7 +12,10 @@ function EditMenu({url, data: dataIn, onHandleDelete}) {
             data.updatedAt
           )}`}</div>
           <div className="edit-menu">
-            <NavLink to={{pathname: `${url}/${data.id}`}} state={{data, len}}>
+            <NavLink
+              to={{pathname: `${url}/${data.id}`}}
+              state={{data, len, comboData}}
+            >
               <i className="fa-solid fa-pencil fa-1x"></i>
               <span>Modifier</span>
             </NavLink>

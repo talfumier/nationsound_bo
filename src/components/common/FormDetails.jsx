@@ -2,7 +2,6 @@ import {useEffect, useState, useContext} from "react";
 import {useLocation} from "react-router-dom";
 import {useParams} from "react-router-dom";
 import _ from "lodash";
-import {isDate} from "date-fns";
 import SelectionContext from "../../services/context/SelectionContext.js";
 import ImagesContext from "../../services/context/ImagesContext.js";
 import {fillUpContainer, getFormattedDate} from "./utilityFunctions.js";
@@ -24,7 +23,7 @@ let updatedData = {},
   updatedImages = [],
   formValid = {};
 
-function FormDetails({entity, master, fields}) {
+function FormDetails({entity, fields}) {
   // entity > {name:"artist",label:"Artiste",labels:"Artistes",imageYes}
   const {id} = useParams(); //route parameter
   const location = useLocation();
@@ -86,8 +85,22 @@ function FormDetails({entity, master, fields}) {
     };
   }, []);
 
-  const [toolbarStatus, setStatus] = useState({save: false});
-  function handleChange(name, fieldValid, value, idx) {
+  const [toolbarStatus, setStatus] = useState({save: false, undo: false});
+  function handleChange(name, format, fieldValid, value, idx) {
+    function actualChange(modified, original) {
+      switch (format) {
+        case "text":
+          break;
+        case "date":
+          modified = modified.setHours(0, 0, 0, 0);
+          original = new Date(original).setHours(0, 0, 0, 0);
+          break;
+        case "date-time":
+          modified = modified.getTime();
+          original = new Date(original).getTime();
+      }
+      return !_.isEqual(modified, original);
+    }
     formValid[name] = fieldValid;
     const valid = JSON.stringify(formValid).indexOf(false) === -1;
     // compare current field value with corresponding state
@@ -101,37 +114,27 @@ function FormDetails({entity, master, fields}) {
         }
         break;
       default: // fields
-        const date = isDate(value);
-        if (
-          !date
-            ? value
-            : new Date(value).setHours(0, 0, 0, 0) !==
-              (!date
-                ? fieldData[name]
-                : new Date(fieldData[name]).setHours(0, 0, 0, 0))
-        )
-          updatedData[name] = value;
+        if (actualChange(value, fieldData[name])) updatedData[name] = value;
         else delete updatedData[name];
     }
     const status = {...toolbarStatus};
+    const bl = Object.keys(updatedData).length > 0 || updatedImages.length > 0;
     if (!fieldValid) status.save = false;
-    else
-      status.save =
-        (Object.keys(updatedData).length > 0 || updatedImages.length > 0) &&
-        valid; //save operation authorized when actual change and complete form is validated
+    else status.save = bl && valid; //save operation authorized when actual change and complete form is validated
+    status.undo = bl;
     setStatus(status);
   }
   function handleUndo() {
     setFieldData({});
     if (entity.imageYes) setImages(fillUpContainer({_id: null, images: []}));
     setReset(reset + 1);
-    setStatus({save: false});
+    setStatus({save: false, undo: false});
     resetChangeMonitor();
   }
   function handleMain(val, idx) {
     let bl = false;
-    updatedImages.map((item) => {
-      if (!bl && item[0] === 2) bl = true; //new image not yet saved
+    images.images.map((item, i) => {
+      if (!bl && i === idx && item.size === 0) bl = true; //new image not yet saved
     });
     if (bl) {
       toastWarning("Merci d'enregistrer l'image avant de la mettre en ligne !");
@@ -143,7 +146,7 @@ function FormDetails({entity, master, fields}) {
       if (val) return (item.main = i === idx ? true : false);
     });
     imgs.images.map((item, i) => {
-      handleChange("images", true, item, i);
+      handleChange("images", null, true, item, i);
     });
     setImages(imgs);
   }
@@ -158,75 +161,94 @@ function FormDetails({entity, master, fields}) {
       if (!bl && item.name.length > 0) bl = true;
     });
     if (!bl && fieldData.images_id) {
-      await deleteContainer(fieldData.images_id, null, signal); //delete image container in API (mongoDB)
-      contextImages.onHandleImages(fieldData.images_id, "remove");
-      await patchEntity(
-        entity.name,
-        fieldData.id,
-        {images_id: null},
-        null,
-        signal
-      ); //update field data in API (MySQL)
-      updatedData.images_id = null;
+      try {
+        await deleteContainer(fieldData.images_id, null, signal); //delete image container in API (mongoDB)
+        contextImages.onHandleImages(fieldData.images_id, "remove");
+        await patchEntity(
+          entity.name,
+          fieldData.id,
+          {images_id: null},
+          null,
+          signal
+        ); //update field data in API (MySQL)
+        updatedData.images_id = null;
+      } catch (error) {
+        //catching errors handled by axios interceptors in httpService.js
+      }
     }
     let body = null;
     if (bl && updatedImages.length > 0) {
-      body = _.filter(imgs.images, (item) => {
-        return item.name.length > 0;
-      });
-      if (fieldData.images_id) {
-        //existing image container
-        await updateContainer(
-          fieldData.images_id,
-          {images: body},
-          null,
-          signal
-        );
-        contextImages.onHandleImages(
-          fieldData.images_id,
-          {images: body},
-          "update"
-        );
-      } else {
-        //no existing image container
-        const {data: res} = await postContainer({images: body}, null, signal);
-        contextImages.onHandleImages(
-          null,
-          {_id: res.data._id, images: body},
-          "add"
-        );
-        updatedData.images_id = res.data._id;
+      try {
+        body = _.filter(imgs.images, (item) => {
+          return item.name.length > 0;
+        });
+        if (fieldData.images_id) {
+          //existing image container
+          await updateContainer(
+            fieldData.images_id,
+            {images: body},
+            null,
+            signal
+          );
+          contextImages.onHandleImages(
+            fieldData.images_id,
+            {images: body},
+            "update"
+          );
+        } else {
+          //no existing image container
+          const {data: res} = await postContainer({images: body}, null, signal);
+          contextImages.onHandleImages(
+            null,
+            {_id: res.data._id, images: body},
+            "add"
+          );
+          updatedData.images_id = res.data._id;
+        }
+      } catch (error) {
+        //catching errors handled by axios interceptors in httpService.js
       }
     }
     /* FIELD DATA PROCESSING */
     if (Object.keys(updatedData).length > 0) {
-      if (id == -1) {
-        if (entity.imageYes && !updatedData.images_id)
-          updatedData.images_id = null;
-        const {data: res} = await postEntity(
-          entity.name,
-          updatedData,
-          null,
-          signal
-        );
-        updatedData.id = res.data.id;
-        contextSelection.onHandleSelected(entity.name, updatedData.id, true);
-      } else await patchEntity(entity.name, id, updatedData, null, signal);
-      setFieldData({...fieldData, ...updatedData}); //update fieldData local state
+      try {
+        if (id == -1) {
+          if (entity.imageYes && !updatedData.images_id)
+            updatedData.images_id = null;
+          const {data: res} = await postEntity(
+            entity.name,
+            updatedData,
+            null,
+            signal
+          );
+          updatedData.id = res.data.id;
+          contextSelection.onHandleSelected(entity.name, updatedData.id, true);
+        } else await patchEntity(entity.name, id, updatedData, null, signal);
+        setFieldData({...fieldData, ...updatedData}); //update fieldData local state
+      } catch (error) {
+        //catching errors handled by axios interceptors in httpService.js
+      }
     }
 
     if (entity.imageYes) setImages(imgs); //update images local state
-    setStatus({...toolbarStatus, save: false});
+    setStatus({save: false, undo: false});
     toastSuccess(
-      `${entity.label} '${{...fieldData, ...updatedData}[master]}' ${
-        id == -1 ? "créé" : "mis à jour"
-      } avec succès !`
+      `${entity.label} ${id == -1 ? "créé" : "mis à jour"} avec succès !`
     );
     resetChangeMonitor();
   }
   function resetChangeMonitor() {
     updatedData = {};
     updatedImages = [];
+  }
+  function getOptions(options) {
+    if (Array.isArray(options)) return options; //simple select element with options data provided in formContent.json
+    //complex select element where options data come from location.state
+    return _.orderBy(location.state.comboData[options], ["name"], ["asc"]).map(
+      (item) => {
+        return [item.id, item.name];
+      }
+    );
   }
   return (
     <div className={`page-container`}>
@@ -252,10 +274,19 @@ function FormDetails({entity, master, fields}) {
               required={field.required === undefined ? true : field.required}
               value={fieldData[field.name]}
               rows={!field.rows ? "3" : field.rows}
-              options={field.type !== "select" ? null : field.options}
+              options={
+                field.type !== "select" ? null : getOptions(field.options)
+              }
               placeholder={field.placeholder ? field.placeholder : null}
               format={field.format ? field.format : "text"}
-              onHandleChange={handleChange}
+              onHandleChange={(name, valid, value) => {
+                handleChange(
+                  name,
+                  field.format ? field.format : "text",
+                  valid,
+                  value
+                );
+              }}
             ></TextInput>
           );
         })}
@@ -269,9 +300,10 @@ function FormDetails({entity, master, fields}) {
                   idx={idx + 1}
                   dataIn={images.images[idx]}
                   onHandleChange={(val) => {
-                    handleChange("images", true, val, idx);
+                    handleChange("images", null, true, val, idx);
                   }}
                   onHandleMain={(val) => {
+                    console.log(val);
                     handleMain(val, idx);
                   }}
                 ></ImageUnit>

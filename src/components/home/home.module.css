@@ -5,7 +5,7 @@
   justify-content:left;
   align-items: top;
   padding:5px 10px;
-  overflow-y: scroll;
+  overflow-y:auto;
 }
 .home img {
   object-fit:scale-down;
