@@ -5,7 +5,7 @@
       "label": "Artiste",
       "labels": "Artistes",
       "orderBy": {"field": "name", "order": "asc"},
-      "fileYes": true
+      "fileYes": "image/png, image/jpeg, image/webp"
     },
     "fields": [
       {
@@ -52,7 +52,7 @@
       "label": "Partenaire",
       "labels": "Partenaires",
       "orderBy": {"field": "name", "order": "asc"},
-      "fileYes": true
+      "fileYes": "image/png, image/jpeg, image/webp"
     },
     "fields": [
       {
@@ -68,8 +68,7 @@
       "name": "transport",
       "label": "Moyen de transport",
       "labels": "Transports",
-      "orderBy": {"field": "name", "order": "asc"},
-      "fileYes": false
+      "orderBy": {"field": "name", "order": "asc"}
     },
     "fields": [
       {
@@ -101,8 +100,7 @@
       "name": "faq",
       "label": "FAQ",
       "labels": "FAQ",
-      "orderBy": {"field": "question", "order": "asc"},
-      "fileYes": false
+      "orderBy": {"field": "question", "order": "asc"}
     },
     "fields": [
       {
@@ -125,8 +123,7 @@
       "name": "message",
       "label": "Message",
       "labels": "Messages",
-      "orderBy": {"field": "title", "order": "asc"},
-      "fileYes": false
+      "orderBy": {"field": "title", "order": "asc"}
     },
     "fields": [
       {
@@ -174,8 +171,7 @@
       "name": "poi",
       "label": "Lieu",
       "labels": "Lieux",
-      "orderBy": {"field": "name", "order": "asc"},
-      "fileYes": false
+      "orderBy": {"field": "name", "order": "asc"}
     },
     "fields": [
       {
@@ -201,8 +197,7 @@
       "name": "date",
       "label": "Date",
       "labels": "Dates",
-      "orderBy": {"field": "start_date", "order": "asc"},
-      "fileYes": false
+      "orderBy": {"field": "start_date", "order": "asc"}
     },
     "fields": [
       {
@@ -260,8 +255,7 @@
       "name": "event",
       "label": "Evènement",
       "labels": "Evènements",
-      "orderBy": {"field": "date", "order": "asc"},
-      "fileYes": false
+      "orderBy": {"field": "date", "order": "asc"}
     },
     "fields": [
       {
@@ -294,6 +288,23 @@
         "placeholder": "jj.MM.aaaa HH.mm",
         "format": "date-time",
         "rows": 2,
+        "listMaster": true
+      }
+    ]
+  },
+  "map": {
+    "entity": {
+      "name": "map",
+      "label": "Carte",
+      "labels": "Carte",
+      "orderBy": {"field": "name", "order": "asc"},
+      "fileYes": "application/json,.umap"
+    },
+    "fields": [
+      {
+        "name": "name",
+        "label": "Carte",
+        "type": "textarea",
         "listMaster": true
       }
     ]

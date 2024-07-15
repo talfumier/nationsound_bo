@@ -6,7 +6,7 @@ import {fileSize, getEmptyFile, getFormattedDate} from "./utilityFunctions.js";
 import config from "../../config.json";
 import {toastError} from "./toastSwal/ToastMessages.js";
 
-function FileUnit({idx, dataIn, onHandleChange, onHandleMain}) {
+function FileUnit({fileYes, idx, dataIn, onHandleChange, onHandleMain}) {
   const textfields = [
     {name: "name", label: "Fichier"},
     {name: "type", label: "Type"},
@@ -29,38 +29,62 @@ function FileUnit({idx, dataIn, onHandleChange, onHandleMain}) {
   function handleSelectedFile(e) {
     const file = e.target.files[0];
     let val = getEmptyFile();
-    // delete val.file;
     if (typeof file !== "undefined") {
       const reader1 = new FileReader();
-      reader1.onload = async function () {
-        let name = file.name;
-        const blob = await arrayBufferToWebP(reader1.result);
-        if (blob.size > config.max_file_size) {
-          toastError(
-            "La taille du fichier est supérieure à la valeur max autorisée !"
-          );
-          return;
-        }
-        const reader2 = new FileReader();
-        reader2.onload = function () {
-          if (!file.type.includes("webp")) {
-            name = file.name.split(".");
-            name.splice(-1, 1);
-            name = name.join(".") + ".webp";
+      if (fileYes.includes("image")) {
+        reader1.onload = async function () {
+          let name = file.name;
+          const blob = await arrayBufferToWebP(reader1.result);
+          if (blob.size > config.max_file_size) {
+            toastError(
+              "La taille du fichier est supérieure à la valeur max autorisée !"
+            );
+            return;
           }
+          const reader2 = new FileReader();
+          reader2.onload = function () {
+            if (!file.type.includes("webp")) {
+              name = file.name.split(".");
+              name.splice(-1, 1);
+              name = name.join(".") + ".webp";
+            }
+            val = {
+              ...val,
+              name,
+              type: blob.type,
+              size: blob.size,
+              lastModified: file.lastModified,
+              data: reader2.result,
+            };
+            processData(val);
+          };
+          reader2.readAsDataURL(blob);
+        };
+        reader1.onerror = function (error) {
+          console.log(
+            "Error during image file upload in FileUnit.jsx: ",
+            error
+          );
+        };
+        reader1.readAsArrayBuffer(file);
+      }
+      if (fileYes.includes("umap")) {
+        reader1.readAsDataURL(file);
+        reader1.onload = function () {
           val = {
             ...val,
-            name,
-            type: blob.type,
-            size: blob.size,
+            name: file.name,
+            type: file.type ? file.type : "umap",
+            size: file.size,
             lastModified: file.lastModified,
-            data: reader2.result,
+            data: reader1.result,
           };
           processData(val);
         };
-        reader2.readAsDataURL(blob);
-      };
-      reader1.readAsArrayBuffer(file);
+        reader1.onerror = function (error) {
+          console.log("Error during umap file upload in FileUnit.jsx: ", error);
+        };
+      }
     } else processData(val);
   }
   function displayData(key) {
@@ -75,11 +99,16 @@ function FileUnit({idx, dataIn, onHandleChange, onHandleMain}) {
         return value[key];
     }
   }
+  const text = () => {
+    if (fileYes.includes("image")) return "Photo";
+    if (fileYes.includes("umap")) return "Fichier";
+    return "";
+  };
   return (
     <div className="file-container">
       <div className="buttons-container">
         <button>
-          Photo
+          {text()}
           <span className="badge">{idx}</span>
           <i className="fa fa-trash fa-1x" onClick={handleClear}></i>
         </button>
@@ -94,7 +123,7 @@ function FileUnit({idx, dataIn, onHandleChange, onHandleMain}) {
             id={`selectFile${idx}`}
             className="upload"
             type="file"
-            accept="file/*"
+            accept={fileYes}
             onChange={(e) => {
               handleSelectedFile(e);
             }}
@@ -119,10 +148,14 @@ function FileUnit({idx, dataIn, onHandleChange, onHandleMain}) {
             onClick={() => {
               onHandleMain(!value.main);
             }}
-          >{`${value.main ? "PHOTO EN LIGNE" : "METTRE EN LIGNE"}`}</button>
-          <div className="file">
-            <img src={value.data} alt={value.name} />
-          </div>
+          >{`${
+            value.main ? text().toUpperCase() + " EN LIGNE" : "METTRE EN LIGNE"
+          }`}</button>
+          {fileYes.includes("image") && (
+            <div className="file">
+              <img src={value.data} alt={value.name} />
+            </div>
+          )}
         </>
       )}
     </div>

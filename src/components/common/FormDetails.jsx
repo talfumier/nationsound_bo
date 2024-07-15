@@ -4,7 +4,7 @@ import {useParams} from "react-router-dom";
 import _ from "lodash";
 import SelectionContext from "../../services/context/SelectionContext.js";
 import ImagesContext from "../../services/context/ImagesContext.js";
-import {fillUpContainer, getFormattedDate} from "./utilityFunctions.js";
+import {fillUpContainer} from "./utilityFunctions.js";
 import PageHeader from "./PageHeader.jsx";
 import Toolbar from "./Toolbar.jsx";
 import TextInput from "./TextInput.jsx";
@@ -25,6 +25,7 @@ let updatedData = {},
 
 function FormDetails({entity, fields}) {
   // entity > {name:"artist",label:"Artiste",labels:"Artistes",fileYes}
+  if (!entity.fileYes) entity.fileYes = "";
   const {id} = useParams(); //route parameter
   const location = useLocation();
   const abortController = new AbortController();
@@ -62,17 +63,19 @@ function FormDetails({entity, fields}) {
   useEffect(() => {
     // files data initialization
     async function loadContainer(_id, signal) {
-      if (id != -1 && _id) {
-        const cont = _.filter(contextImages.containers, (item) => {
-          return item._id === fieldData.files_id;
-        })[0];
-        if (cont) setFiles(fillUpContainer(cont));
-        else {
-          const {data: res} = await getContainerById(_id, signal);
-          contextImages.onHandleImages(null, res.data, "add");
-          setFiles(fillUpContainer(res.data));
+      try {
+        if (id != -1 && _id) {
+          const cont = _.filter(contextImages.containers, (item) => {
+            return item._id === fieldData.files_id;
+          })[0];
+          if (cont) setFiles(fillUpContainer(cont));
+          else {
+            const {data: res} = await getContainerById(_id, signal);
+            contextImages.onHandleImages(null, res.data, "add");
+            setFiles(fillUpContainer(res.data));
+          }
         }
-      }
+      } catch (error) {}
     }
     if (entity.fileYes) loadContainer(fieldData.files_id, signal);
   }, [reset, contextImages.containers, fieldData.files_id]);
@@ -140,24 +143,24 @@ function FormDetails({entity, fields}) {
       );
       return;
     }
-    const imgs = _.cloneDeep(files);
-    imgs.files.map((item, i) => {
+    const fls = _.cloneDeep(files);
+    fls.files.map((item, i) => {
       if (!val && i === idx) return (item.main = false);
       if (val) return (item.main = i === idx ? true : false);
     });
-    imgs.files.map((item, i) => {
+    fls.files.map((item, i) => {
       handleChange("files", null, true, item, i);
     });
-    setFiles(imgs);
+    setFiles(fls);
   }
   async function handleSave() {
-    /* IMAGES DATA PROCESSING */
-    const imgs = _.cloneDeep(files);
+    /* FILES DATA PROCESSING */
+    const fls = _.cloneDeep(files);
     updatedFiles.map((item) => {
-      imgs.files[item[0]] = item[1]; //update files state clone i.a.w updatedFiles
+      fls.files[item[0]] = item[1]; //update files state clone i.a.w updatedFiles
     });
     let bl = false; //check all 3 files contain no data
-    imgs.files.map((item) => {
+    fls.files.map((item) => {
       if (!bl && item.name.length > 0) bl = true;
     });
     if (!bl && fieldData.files_id) {
@@ -179,7 +182,7 @@ function FormDetails({entity, fields}) {
     let body = null;
     if (bl && updatedFiles.length > 0) {
       try {
-        body = _.filter(imgs.files, (item) => {
+        body = _.filter(fls.files, (item) => {
           return item.name.length > 0;
         });
         if (fieldData.files_id) {
@@ -190,19 +193,21 @@ function FormDetails({entity, fields}) {
             null,
             signal
           );
-          contextImages.onHandleImages(
-            fieldData.files_id,
-            {files: body},
-            "update"
-          );
+          if (entity.fileYes.includes("image"))
+            contextImages.onHandleImages(
+              fieldData.files_id,
+              {files: body},
+              "update"
+            );
         } else {
           //no existing file container
           const {data: res} = await postContainer({files: body}, null, signal);
-          contextImages.onHandleImages(
-            null,
-            {_id: res.data._id, files: body},
-            "add"
-          );
+          if (entity.fileYes.includes("image"))
+            contextImages.onHandleImages(
+              null,
+              {_id: res.data._id, files: body},
+              "add"
+            );
           updatedData.files_id = res.data._id;
         }
       } catch (error) {
@@ -230,7 +235,7 @@ function FormDetails({entity, fields}) {
       }
     }
 
-    if (entity.fileYes) setFiles(imgs); //update files local state
+    if (entity.fileYes) setFiles(fls); //update files local state
     setStatus({save: false, undo: false});
     toastSuccess(
       `${entity.label} ${id == -1 ? "créé" : "mis à jour"} avec succès !`
@@ -290,13 +295,24 @@ function FormDetails({entity, fields}) {
             ></TextInput>
           );
         })}
+        {entity.fileYes.includes("umap") && (
+          <a
+            target="_blank"
+            href="https://umap.openstreetmap.fr/en/map/nationsound_chantilly_1018592#16/49.1915/2.4771"
+          >
+            Lien vers carte hébergée sur umap
+          </a>
+        )}
         {entity.fileYes && (
           <>
-            <label className="files-label">Photos</label>
+            <label className="files-label">{`${
+              entity.fileYes.includes("image") ? "Photos" : ""
+            }${entity.fileYes.includes("umap") ? "Données" : ""}`}</label>
             {range(0, 2).map((idx) => {
               return (
                 <FileUnit
                   key={idx}
+                  fileYes={entity.fileYes}
                   idx={idx + 1}
                   dataIn={files.files[idx]}
                   onHandleChange={(val) => {

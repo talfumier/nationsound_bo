@@ -321,7 +321,7 @@ div.product-details {
   div.product-details.artist {
     grid-template-rows: max(120px) max(150px) max(30px) max(350px);
   }
-  div.product-details.partner {
+  div.product-details.partner, div.product-details.map {
     grid-template-rows: max(120px) max(30px) max(350px);
   }
   div.product-details.transport {
@@ -445,6 +445,11 @@ div.product-details label {
   opacity: 0.8;
   font-style: italic;
   padding:5px 0;
+}
+div.product-details a {
+  font-size:1.5rem;
+  margin:30px 0px;
+  align-self: top;
 }
 div.product-details label.files-label {
   grid-column: 1/-1;
