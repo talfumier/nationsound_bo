@@ -308,5 +308,23 @@
         "listMaster": true
       }
     ]
+  },
+
+  "logo": {
+    "entity": {
+      "name": "logo",
+      "label": "Logo",
+      "labels": "Logo",
+      "orderBy": {"field": "name", "order": "asc"},
+      "fileYes": "image/png, image/jpeg, image/webp"
+    },
+    "fields": [
+      {
+        "name": "name",
+        "label": "Logo",
+        "type": "textarea",
+        "listMaster": true
+      }
+    ]
   }
 }

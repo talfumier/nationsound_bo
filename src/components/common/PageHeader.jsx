@@ -9,7 +9,12 @@ function PageHeader({title, len, url, data}) {
     const path = url ? url : location.pathname;
     if (path.length === 0) return false;
     if (path.split("/").length >= 3) return false;
-    if (path.includes("dates") || path.includes("maps")) return len === 0;
+    if (
+      path.includes("dates") ||
+      path.includes("maps") ||
+      path.includes("logos")
+    )
+      return len === 0;
     return true;
   };
   return (

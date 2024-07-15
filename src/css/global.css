@@ -321,7 +321,8 @@ div.product-details {
   div.product-details.artist {
     grid-template-rows: max(120px) max(150px) max(30px) max(350px);
   }
-  div.product-details.partner, div.product-details.map {
+  div.product-details.partner, div.product-details.map,
+  div.product-details.logo {
     grid-template-rows: max(120px) max(30px) max(350px);
   }
   div.product-details.transport {

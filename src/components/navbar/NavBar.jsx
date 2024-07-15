@@ -1,38 +1,28 @@
 import {NavLink} from "react-router-dom";
 
 function NavBar() {
+  const items = [
+    ["/", "Accueil"],
+    ["/messages", "Messages"],
+    ["/dates", "Dates"],
+    ["/pois", "Lieux"],
+    ["/artists", "Artistes"],
+    ["/events", "Programme"],
+    ["/partners", "Partenaires"],
+    ["/transports", "Transport"],
+    ["/faqs", "FAQ"],
+    ["/maps", "Carte"],
+    ["/logos", "Logo"],
+  ];
   return (
     <nav className="navbar">
-      <NavLink to="/">
-        <p>Accueil</p>
-      </NavLink>
-      <NavLink to="/messages">
-        <p>Messages</p>
-      </NavLink>
-      <NavLink to="/dates">
-        <p>Dates</p>
-      </NavLink>
-      <NavLink to="/pois">
-        <p>Lieux</p>
-      </NavLink>
-      <NavLink to="/artists">
-        <p>Artistes</p>
-      </NavLink>
-      <NavLink to="/events">
-        <p>Programme</p>
-      </NavLink>
-      <NavLink to="/partners">
-        <p>Partenaires</p>
-      </NavLink>
-      <NavLink to="/transports">
-        <p>Transport</p>
-      </NavLink>
-      <NavLink to="/faqs">
-        <p>FAQ</p>
-      </NavLink>
-      <NavLink to="/maps">
-        <p>Carte</p>
-      </NavLink>
+      {items.map((item, idx) => {
+        return (
+          <NavLink key={idx} to={item[0]}>
+            <p>{item[1]}</p>
+          </NavLink>
+        );
+      })}
     </nav>
   );
 }
