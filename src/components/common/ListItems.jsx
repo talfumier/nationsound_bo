@@ -10,7 +10,7 @@ import {toastSuccess} from "./toastSwal/ToastMessages.js";
 import {getFormattedDate} from "./utilityFunctions.js";
 
 function ListItems({entity, master, url}) {
-  // entity > {name:"artist",label:"Artiste",labels:"Artistes",imageYes}
+  // entity > {name:"artist",label:"Artiste",labels:"Artistes",fileYes}
   const contextSelection = useContext(SelectionContext);
   const contextImages = useContext(ImagesContext);
   const abortController = new AbortController();
@@ -58,9 +58,9 @@ function ListItems({entity, master, url}) {
         id,
         null,
         abortController.signal
-      ); //associated images (if any) deleted as well
-      if (entity.imageYes)
-        contextImages.onHandleImages(res.data.images_id, null, "remove");
+      ); //associated files (if any) deleted as well
+      if (entity.fileYes)
+        contextImages.onHandleImages(res.data.files_id, null, "remove");
       contextSelection.onHandleSelected(entity.name, -1, false);
       setItems(
         _.filter(items, (item) => {

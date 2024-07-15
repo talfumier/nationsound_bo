@@ -8,7 +8,7 @@ import {fillUpContainer, getFormattedDate} from "./utilityFunctions.js";
 import PageHeader from "./PageHeader.jsx";
 import Toolbar from "./Toolbar.jsx";
 import TextInput from "./TextInput.jsx";
-import ImageUnit from "./ImageUnit.jsx";
+import FileUnit from "./FileUnit.jsx";
 import {range} from "./utilityFunctions.js";
 import {toastSuccess, toastWarning} from "./toastSwal/ToastMessages.js";
 import {postEntity, patchEntity} from "../../services/httpEntities.js";
@@ -17,14 +17,14 @@ import {
   deleteContainer,
   getContainerById,
   updateContainer,
-} from "../../services/httpImages.jsx";
+} from "../../services/httpFiles.jsx";
 
 let updatedData = {},
-  updatedImages = [],
+  updatedFiles = [],
   formValid = {};
 
 function FormDetails({entity, fields}) {
-  // entity > {name:"artist",label:"Artiste",labels:"Artistes",imageYes}
+  // entity > {name:"artist",label:"Artiste",labels:"Artistes",fileYes}
   const {id} = useParams(); //route parameter
   const location = useLocation();
   const abortController = new AbortController();
@@ -36,7 +36,7 @@ function FormDetails({entity, fields}) {
       let required = field.required === undefined ? true : field.required;
       formValid[name] = id == -1 && required ? false : true; //id=-1 > new record creation case
     });
-    formValid.images_id = true;
+    formValid.files_id = true;
   }
   useEffect(() => {
     initFormValid();
@@ -51,33 +51,31 @@ function FormDetails({entity, fields}) {
       fields.map((field) => {
         obj[field.name] = "";
       });
-      obj.images_id = null;
+      obj.files_id = null;
       return obj;
     }
     setFieldData(id != -1 ? location.state.data : initEmpty());
   }, [reset]);
   /* IMAGES DATA */
   const contextImages = useContext(ImagesContext);
-  const [images, setImages] = useState(
-    fillUpContainer({_id: null, images: []})
-  );
+  const [files, setFiles] = useState(fillUpContainer({_id: null, files: []}));
   useEffect(() => {
-    // images data initialization
+    // files data initialization
     async function loadContainer(_id, signal) {
       if (id != -1 && _id) {
         const cont = _.filter(contextImages.containers, (item) => {
-          return item._id === fieldData.images_id;
+          return item._id === fieldData.files_id;
         })[0];
-        if (cont) setImages(fillUpContainer(cont));
+        if (cont) setFiles(fillUpContainer(cont));
         else {
           const {data: res} = await getContainerById(_id, signal);
           contextImages.onHandleImages(null, res.data, "add");
-          setImages(fillUpContainer(res.data));
+          setFiles(fillUpContainer(res.data));
         }
       }
     }
-    if (entity.imageYes) loadContainer(fieldData.images_id, signal);
-  }, [reset, contextImages.containers, fieldData.images_id]);
+    if (entity.fileYes) loadContainer(fieldData.files_id, signal);
+  }, [reset, contextImages.containers, fieldData.files_id]);
   /* CLEAN UP */
   useEffect(() => {
     return () => {
@@ -105,12 +103,12 @@ function FormDetails({entity, fields}) {
     const valid = JSON.stringify(formValid).indexOf(false) === -1;
     // compare current field value with corresponding state
     switch (name) {
-      case "images":
-        updatedImages = _.filter(updatedImages, (item) => {
+      case "files":
+        updatedFiles = _.filter(updatedFiles, (item) => {
           return item[0] !== idx;
         });
-        if (!_.isEqual(value, images.images[idx])) {
-          updatedImages = [...updatedImages, ...[[idx, value]]];
+        if (!_.isEqual(value, files.files[idx])) {
+          updatedFiles = [...updatedFiles, ...[[idx, value]]];
         }
         break;
       default: // fields
@@ -118,7 +116,7 @@ function FormDetails({entity, fields}) {
         else delete updatedData[name];
     }
     const status = {...toolbarStatus};
-    const bl = Object.keys(updatedData).length > 0 || updatedImages.length > 0;
+    const bl = Object.keys(updatedData).length > 0 || updatedFiles.length > 0;
     if (!fieldValid) status.save = false;
     else status.save = bl && valid; //save operation authorized when actual change and complete form is validated
     status.undo = bl;
@@ -126,84 +124,86 @@ function FormDetails({entity, fields}) {
   }
   function handleUndo() {
     setFieldData({});
-    if (entity.imageYes) setImages(fillUpContainer({_id: null, images: []}));
+    if (entity.fileYes) setFiles(fillUpContainer({_id: null, files: []}));
     setReset(reset + 1);
     setStatus({save: false, undo: false});
     resetChangeMonitor();
   }
   function handleMain(val, idx) {
     let bl = false;
-    images.images.map((item, i) => {
-      if (!bl && i === idx && item.size === 0) bl = true; //new image not yet saved
+    files.files.map((item, i) => {
+      if (!bl && i === idx && item.size === 0) bl = true; //new file not yet saved
     });
     if (bl) {
-      toastWarning("Merci d'enregistrer l'image avant de la mettre en ligne !");
+      toastWarning(
+        "Merci d'enregistrer le fichier avant de la mettre en ligne !"
+      );
       return;
     }
-    const imgs = _.cloneDeep(images);
-    imgs.images.map((item, i) => {
+    const imgs = _.cloneDeep(files);
+    imgs.files.map((item, i) => {
       if (!val && i === idx) return (item.main = false);
       if (val) return (item.main = i === idx ? true : false);
     });
-    imgs.images.map((item, i) => {
-      handleChange("images", null, true, item, i);
+    imgs.files.map((item, i) => {
+      handleChange("files", null, true, item, i);
     });
-    setImages(imgs);
+    setFiles(imgs);
   }
   async function handleSave() {
     /* IMAGES DATA PROCESSING */
-    const imgs = _.cloneDeep(images);
-    updatedImages.map((item) => {
-      imgs.images[item[0]] = item[1]; //update images state clone i.a.w updatedImages
+    const imgs = _.cloneDeep(files);
+    updatedFiles.map((item) => {
+      imgs.files[item[0]] = item[1]; //update files state clone i.a.w updatedFiles
     });
-    let bl = false; //check all 3 images contain no data
-    imgs.images.map((item) => {
+    let bl = false; //check all 3 files contain no data
+    imgs.files.map((item) => {
       if (!bl && item.name.length > 0) bl = true;
     });
-    if (!bl && fieldData.images_id) {
+    if (!bl && fieldData.files_id) {
       try {
-        await deleteContainer(fieldData.images_id, null, signal); //delete image container in API (mongoDB)
-        contextImages.onHandleImages(fieldData.images_id, "remove");
+        await deleteContainer(fieldData.files_id, null, signal); //delete file container in API (mongoDB)
+        contextImages.onHandleImages(fieldData.files_id, "remove");
         await patchEntity(
           entity.name,
           fieldData.id,
-          {images_id: null},
+          {files_id: null},
           null,
           signal
         ); //update field data in API (MySQL)
-        updatedData.images_id = null;
+        updatedData.files_id = null;
       } catch (error) {
         //catching errors handled by axios interceptors in httpService.js
       }
     }
     let body = null;
-    if (bl && updatedImages.length > 0) {
+    if (bl && updatedFiles.length > 0) {
       try {
-        body = _.filter(imgs.images, (item) => {
+        body = _.filter(imgs.files, (item) => {
           return item.name.length > 0;
         });
-        if (fieldData.images_id) {
-          //existing image container
+        if (fieldData.files_id) {
+          //existing file container
           await updateContainer(
-            fieldData.images_id,
-            {images: body},
+            fieldData.files_id,
+            {files: body},
             null,
             signal
           );
           contextImages.onHandleImages(
-            fieldData.images_id,
-            {images: body},
+            fieldData.files_id,
+            {files: body},
             "update"
           );
         } else {
-          //no existing image container
-          const {data: res} = await postContainer({images: body}, null, signal);
+          //no existing file container
+          const {data: res} = await postContainer({files: body}, null, signal);
           contextImages.onHandleImages(
             null,
-            {_id: res.data._id, images: body},
+            {_id: res.data._id, files: body},
             "add"
           );
-          updatedData.images_id = res.data._id;
+          updatedData.files_id = res.data._id;
         }
       } catch (error) {
         //catching errors handled by axios interceptors in httpService.js
@@ -213,8 +213,8 @@ function FormDetails({entity, fields}) {
     if (Object.keys(updatedData).length > 0) {
       try {
         if (id == -1) {
-          if (entity.imageYes && !updatedData.images_id)
-            updatedData.images_id = null;
+          if (entity.fileYes && !updatedData.files_id)
+            updatedData.files_id = null;
           const {data: res} = await postEntity(
             entity.name,
             updatedData,
@@ -230,7 +230,7 @@ function FormDetails({entity, fields}) {
       }
     }
 
-    if (entity.imageYes) setImages(imgs); //update images local state
+    if (entity.fileYes) setFiles(imgs); //update files local state
     setStatus({save: false, undo: false});
     toastSuccess(
       `${entity.label} ${id == -1 ? "créé" : "mis à jour"} avec succès !`
@@ -239,7 +239,7 @@ function FormDetails({entity, fields}) {
   }
   function resetChangeMonitor() {
     updatedData = {};
-    updatedImages = [];
+    updatedFiles = [];
   }
   function getOptions(options) {
     if (Array.isArray(options)) return options; //simple select element with options data provided in formContent.json
@@ -290,23 +290,22 @@ function FormDetails({entity, fields}) {
             ></TextInput>
           );
         })}
-        {entity.imageYes && (
+        {entity.fileYes && (
           <>
-            <label className="images-label">Photos</label>
+            <label className="files-label">Photos</label>
             {range(0, 2).map((idx) => {
               return (
-                <ImageUnit
+                <FileUnit
                   key={idx}
                   idx={idx + 1}
-                  dataIn={images.images[idx]}
+                  dataIn={files.files[idx]}
                   onHandleChange={(val) => {
-                    handleChange("images", null, true, val, idx);
+                    handleChange("files", null, true, val, idx);
                   }}
                   onHandleMain={(val) => {
-                    console.log(val);
                     handleMain(val, idx);
                   }}
-                ></ImageUnit>
+                ></FileUnit>
               );
             })}
           </>

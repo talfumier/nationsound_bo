@@ -5,7 +5,7 @@
       "label": "Artiste",
       "labels": "Artistes",
       "orderBy": {"field": "name", "order": "asc"},
-      "imageYes": true
+      "fileYes": true
     },
     "fields": [
       {
@@ -52,7 +52,7 @@
       "label": "Partenaire",
       "labels": "Partenaires",
       "orderBy": {"field": "name", "order": "asc"},
-      "imageYes": true
+      "fileYes": true
     },
     "fields": [
       {
@@ -69,7 +69,7 @@
       "label": "Moyen de transport",
       "labels": "Transports",
       "orderBy": {"field": "name", "order": "asc"},
-      "imageYes": false
+      "fileYes": false
     },
     "fields": [
       {
@@ -102,7 +102,7 @@
       "label": "FAQ",
       "labels": "FAQ",
       "orderBy": {"field": "question", "order": "asc"},
-      "imageYes": false
+      "fileYes": false
     },
     "fields": [
       {
@@ -126,7 +126,7 @@
       "label": "Message",
       "labels": "Messages",
       "orderBy": {"field": "title", "order": "asc"},
-      "imageYes": false
+      "fileYes": false
     },
     "fields": [
       {
@@ -175,7 +175,7 @@
       "label": "Lieu",
       "labels": "Lieux",
       "orderBy": {"field": "name", "order": "asc"},
-      "imageYes": false
+      "fileYes": false
     },
     "fields": [
       {
@@ -202,7 +202,7 @@
       "label": "Date",
       "labels": "Dates",
       "orderBy": {"field": "start_date", "order": "asc"},
-      "imageYes": false
+      "fileYes": false
     },
     "fields": [
       {
@@ -261,7 +261,7 @@
       "label": "Evènement",
       "labels": "Evènements",
       "orderBy": {"field": "date", "order": "asc"},
-      "imageYes": false
+      "fileYes": false
     },
     "fields": [
       {

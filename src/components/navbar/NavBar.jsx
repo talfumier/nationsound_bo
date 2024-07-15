@@ -31,7 +31,7 @@ function NavBar() {
         <p>FAQ</p>
       </NavLink>
       <NavLink to="/medias">
-        <p>Media</p>
+        <p>Carte</p>
       </NavLink>
     </nav>
   );

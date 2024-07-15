@@ -2,11 +2,11 @@ import {useState, useEffect} from "react";
 import {arrayBufferToWebP} from "webp-converter-browser";
 import {toDate} from "date-fns";
 import TextBox from "./TextBox.jsx";
-import {fileSize, getEmptyImage, getFormattedDate} from "./utilityFunctions.js";
+import {fileSize, getEmptyFile, getFormattedDate} from "./utilityFunctions.js";
 import config from "../../config.json";
 import {toastError} from "./toastSwal/ToastMessages.js";
 
-function ImageUnit({idx, dataIn, onHandleChange, onHandleMain}) {
+function FileUnit({idx, dataIn, onHandleChange, onHandleMain}) {
   const textfields = [
     {name: "name", label: "Fichier"},
     {name: "type", label: "Type"},
@@ -20,7 +20,7 @@ function ImageUnit({idx, dataIn, onHandleChange, onHandleMain}) {
 
   function handleClear() {
     document.getElementById(`selectFile${idx}`).value = ""; //reset file selector
-    processData(getEmptyImage());
+    processData(getEmptyFile());
   }
   function processData(val) {
     setValue(val);
@@ -28,14 +28,14 @@ function ImageUnit({idx, dataIn, onHandleChange, onHandleMain}) {
   }
   function handleSelectedFile(e) {
     const file = e.target.files[0];
-    let val = getEmptyImage();
-    delete val.image;
+    let val = getEmptyFile();
+    // delete val.file;
     if (typeof file !== "undefined") {
       const reader1 = new FileReader();
       reader1.onload = async function () {
         let name = file.name;
         const blob = await arrayBufferToWebP(reader1.result);
-        if (blob.size > config.max_image_size) {
+        if (blob.size > config.max_file_size) {
           toastError(
             "La taille du fichier est supérieure à la valeur max autorisée !"
           );
@@ -76,7 +76,7 @@ function ImageUnit({idx, dataIn, onHandleChange, onHandleMain}) {
     }
   }
   return (
-    <div className="image-container">
+    <div className="file-container">
       <div className="buttons-container">
         <button>
           Photo
@@ -94,7 +94,7 @@ function ImageUnit({idx, dataIn, onHandleChange, onHandleMain}) {
             id={`selectFile${idx}`}
             className="upload"
             type="file"
-            accept="image/*"
+            accept="file/*"
             onChange={(e) => {
               handleSelectedFile(e);
             }}
@@ -120,7 +120,7 @@ function ImageUnit({idx, dataIn, onHandleChange, onHandleMain}) {
               onHandleMain(!value.main);
             }}
           >{`${value.main ? "PHOTO EN LIGNE" : "METTRE EN LIGNE"}`}</button>
-          <div className="image">
+          <div className="file">
             <img src={value.data} alt={value.name} />
           </div>
         </>
@@ -129,4 +129,4 @@ function ImageUnit({idx, dataIn, onHandleChange, onHandleMain}) {
   );
 }
 
-export default ImageUnit;
+export default FileUnit;

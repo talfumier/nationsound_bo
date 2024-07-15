@@ -328,7 +328,7 @@ div.product-details {
     grid-template-rows: max(120px) max(30px) auto;
   }
 }
-div.image-container {
+div.file-container {
   display:flex;
   flex-wrap: wrap;
   border: solid 1px green;
@@ -336,18 +336,18 @@ div.image-container {
   margin-bottom:10px;
   max-width:300px;
 }
-div.image-container:not(:has(div.image)){
+div.file-container:not(:has(div.file)){
   height: 170px;
 }
-div.image-container input.upload {
+div.file-container input.upload {
   display:none;
 }
-div.image-container div.buttons-container {
+div.file-container div.buttons-container {
   display:flex;
   justify-content: space-between;
   width:100%;
 }
-div.image-container button {
+div.file-container button {
   font-size: 1.5rem;
   padding:5px 10px;
   margin:1px;
@@ -358,10 +358,10 @@ div.image-container button {
   height:3rem;
   cursor: pointer;
 }
-div.image-container span {
+div.file-container span {
   padding:0 5px;
 }
-div.image-container button.publish {
+div.file-container button.publish {
   display:flex;
   justify-content: center;
   align-items: center;
@@ -372,7 +372,7 @@ div.image-container button.publish {
   background-color: var(--red);
   border-radius: 0px;
 }
-div.image-container div.image img {
+div.file-container div.file img {
   width:100%;
   height:100%;
   object-fit: cover;
@@ -446,7 +446,7 @@ div.product-details label {
   font-style: italic;
   padding:5px 0;
 }
-div.product-details label.images-label {
+div.product-details label.files-label {
   grid-column: 1/-1;
 }
 div.file-details {

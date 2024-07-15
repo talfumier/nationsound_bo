@@ -59,7 +59,7 @@ export function fileSize(size) {
     return `${(size / 1048576).toFixed(1)} MB`;
   }
 }
-export function getEmptyImage() {
+export function getEmptyFile() {
   return {
     name: "",
     main: false,
@@ -70,10 +70,10 @@ export function getEmptyImage() {
   };
 }
 export function fillUpContainer(cont) {
-  let n = cont.images.length;
+  let n = cont.files.length;
   if (n >= 3) return cont;
   do {
-    cont.images.push(getEmptyImage());
+    cont.files.push(getEmptyFile());
     n += 1;
   } while (n < 3);
   return cont;
