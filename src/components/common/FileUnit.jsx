@@ -148,9 +148,7 @@ function FileUnit({fileYes, idx, dataIn, onHandleChange, onHandleMain}) {
             onClick={() => {
               onHandleMain(!value.main);
             }}
-          >{`${
-            value.main ? text().toUpperCase() + " EN LIGNE" : "METTRE EN LIGNE"
-          }`}</button>
+          >{`${value.main ? "ACTIF" : "ACTIVER"}`}</button>
           {fileYes.includes("image") && (
             <div className="file">
               <img src={value.data} alt={value.name} />

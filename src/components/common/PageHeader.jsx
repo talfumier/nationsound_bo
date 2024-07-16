@@ -1,9 +1,8 @@
-import {useNavigate, NavLink, useLocation} from "react-router-dom";
-import {Tooltip} from "react-tooltip";
+import {NavLink, useLocation} from "react-router-dom";
+import BackButton from "./BackButton.jsx";
 
 function PageHeader({title, len, url, data}) {
   const location = useLocation();
-  const navigate = useNavigate();
 
   const cond = () => {
     const path = url ? url : location.pathname;
@@ -19,23 +18,7 @@ function PageHeader({title, len, url, data}) {
   };
   return (
     <div className="page-header">
-      <a className="tooltip-anchor-back">
-        <Tooltip
-          className="toolbar-button tooltip"
-          anchorSelect=".tooltip-anchor-back"
-          place="bottom"
-          variant="info"
-          content="Retour page précédente."
-        />
-        <button
-          className="back-button"
-          onClick={() => {
-            navigate(-1);
-          }}
-        >
-          <i className="fa-solid fa-arrow-left fa-3x"></i>
-        </button>
-      </a>
+      <BackButton></BackButton>
       <h2>
         {title}
         <span>{len}</span>

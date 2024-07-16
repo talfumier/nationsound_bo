@@ -1,5 +1,10 @@
 import {parseISO, format, isDate} from "date-fns";
 import _ from "lodash";
+export function isValidInteger(str) {
+  if (str.toString().includes(".") || str.toString().includes(","))
+    return false;
+  return !isNaN(str);
+}
 export function strToDate(str) {
   let arr = str.split(" ");
   arr = [...arr[0].split("."), ...(arr[1] ? arr[1].split(":") : [])];

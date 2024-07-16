@@ -162,6 +162,7 @@
         "name": "order",
         "label": "Ordre d'affichage",
         "type": "textarea",
+        "format": "integer",
         "rows": "1"
       }
     ]
@@ -324,6 +325,53 @@
         "label": "Logo",
         "type": "textarea",
         "listMaster": true
+      }
+    ]
+  },
+  "user": {
+    "entity": {
+      "name": "user",
+      "label": "Profil",
+      "fileYes": "image/png, image/jpeg, image/webp",
+      "noList": "users"
+    },
+    "fields": [
+      {
+        "name": "last_name",
+        "label": "Nom de famille",
+        "type": "textarea",
+        "rows": 2,
+        "required": false
+      },
+      {
+        "name": "first_name",
+        "label": "Prénom",
+        "type": "textarea",
+        "rows": 2,
+        "required": false
+      },
+      {
+        "name": "email",
+        "label": "Email",
+        "type": "textarea",
+        "rows": 2,
+        "format": "email"
+      },
+      {
+        "name": "role",
+        "label": "Role",
+        "type": "textarea",
+        "disabled": true,
+        "rows": 1
+      },
+      {
+        "name": "validated",
+        "label": "Compte Validé",
+        "type": "textarea",
+        "format": "date-time",
+        "disabled": true,
+        "rows": 1,
+        "required": false
       }
     ]
   }

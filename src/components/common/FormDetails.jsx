@@ -11,7 +11,11 @@ import TextInput from "./TextInput.jsx";
 import FileUnit from "./FileUnit.jsx";
 import {range} from "./utilityFunctions.js";
 import {toastSuccess, toastWarning} from "./toastSwal/ToastMessages.js";
-import {postEntity, patchEntity} from "../../services/httpEntities.js";
+import {
+  postEntity,
+  patchEntity,
+  getEntity,
+} from "../../services/httpEntities.js";
 import {
   postContainer,
   deleteContainer,
@@ -24,8 +28,9 @@ let updatedData = {},
   formValid = {};
 
 function FormDetails({entity, fields}) {
-  // entity > {name:"artist",label:"Artiste",labels:"Artistes",fileYes}
+  // entity > {name:"artist",label:"Artiste",labels:"Artistes",fileYes, noList}
   if (!entity.fileYes) entity.fileYes = "";
+  if (!entity.noList) entity.noList = "";
   const {id} = useParams(); //route parameter
   const location = useLocation();
   const abortController = new AbortController();
@@ -55,9 +60,17 @@ function FormDetails({entity, fields}) {
       obj.files_id = null;
       return obj;
     }
-    setFieldData(id != -1 ? location.state.data : initEmpty());
+    async function loadData(signal) {
+      try {
+        const {data: res} = await getEntity(entity.name, id, null, signal);
+        setFieldData(res.data);
+      } catch (error) {}
+    }
+    if (!entity.noList)
+      setFieldData(id != -1 ? location.state.data : initEmpty());
+    else loadData(signal);
   }, [reset]);
-  /* IMAGES DATA */
+  /* FILES DATA */
   const contextImages = useContext(ImagesContext);
   const [files, setFiles] = useState(fillUpContainer({_id: null, files: []}));
   useEffect(() => {
@@ -256,13 +269,18 @@ function FormDetails({entity, fields}) {
     );
   }
   return (
-    <div className={`page-container`}>
-      <PageHeader
-        title={`${entity.labels}`}
-        len={location.state.len}
-      ></PageHeader>
-      <hr />
+    <div className={`page-container ${entity.name}`}>
+      {!entity.noList && (
+        <>
+          <PageHeader
+            title={`${entity.labels}`}
+            len={location.state.len}
+          ></PageHeader>
+          <hr />
+        </>
+      )}
       <Toolbar
+        back={entity.noList ? true : false}
         status={toolbarStatus}
         onHandleSave={handleSave}
         onHandleUndo={handleUndo}
@@ -276,6 +294,7 @@ function FormDetails({entity, fields}) {
               name={field.name}
               label={field.label}
               type={field.type}
+              disabled={field.disabled === undefined ? false : field.disabled}
               required={field.required === undefined ? true : field.required}
               value={fieldData[field.name]}
               rows={!field.rows ? "3" : field.rows}

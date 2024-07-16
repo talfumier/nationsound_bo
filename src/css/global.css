@@ -91,13 +91,101 @@ div.app-wrapper {
 div.app-main-content {
   grid-row: 2;
   display: grid;
-  grid-template-columns: 120px auto;
+  grid-template-columns: 140px auto;
   grid-template-rows:100%;
   justify-items: start;
   position:fixed;
   top:97px;
   height:calc(100% - 97px);
   width:100%;
+}
+@media (min-width:860px){
+  div.app-main-content {
+    grid-template-columns: 170px auto;
+  }
+}
+/* HEADER */
+.header {
+  position: fixed;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--black);
+  color: var(--white-opaque8);
+  width: 100vw;
+  min-width: 350px;
+  height: 97px;
+  padding: 0;
+}
+
+.header div.logo-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header div.logo {
+  position: relative;
+  background-color: var(--white);
+  min-width: 60px;
+  min-height: 60px;
+  border: solid 5px var(--orange);
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  margin: 0 15px;
+}
+
+.header div.logo img {
+  position: absolute;
+  top: 3px;
+  left: 6px;
+  width: 50px;
+  height: 50px;
+}
+
+.header h1 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-right: 15px;
+  color: var(--white);
+}
+button.disconnect {
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+  font-size:1.2rem;
+  font-weight:550;
+  color:var(--red);
+  border-radius: 10px;
+  margin:0 20px;
+  cursor: pointer;
+}
+button.disconnect:hover {
+  font-weight:800;
+  font-size:1.3rem;
+  transition:.3s;
+}
+button.disconnect img {
+  padding-top:5px;
+  width:25px;
+  height:25px;
+}
+button.disconnect p {
+  margin:5px 0;
+}
+@media screen and (min-width: 768px) {
+  .header div.logo {
+    margin: 0 30px;
+  }
+
+  .header h1 {
+    margin-right: 30px;
+  }
 }
 /* NAVIGATION BAR */
 .navbar {
@@ -107,9 +195,27 @@ div.app-main-content {
   background-color: aquamarine;
   padding: 20px 0;
   height: 100%;
+  width:100%;
+} 
+.navbar hr {
+  margin:15px 0;
+  color:var(--grey-light);
+  border: 1px solid grey;
+}
+div.avatar {
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  margin:0 auto;
+  border:1px solid var(--red);
+  border-radius:50%;
+  width:60px;
+  height:60px;
+  background-color: yellow;
+  cursor: pointer;
 }
 .navbar p {
-  padding: 5px 10px;
+  padding: 5px 20px;
   margin: 0;
   cursor: pointer;
 }
@@ -120,13 +226,24 @@ div.app-main-content {
   transition: .3s;
 }
 .navbar a.active p {
-  color: var(--red);
+  color: var(--red);font-weight: 550;
 }
 .navbar a:link {
   text-decoration: none;
 }
 .navbar a:visited {
   text-decoration: none;
+}
+.navbar p.legal-notice {
+  font-size:1.5rem;
+  padding:5px 0;
+  text-align: center;
+}
+.navbar div.fa-eye {
+  /* padding:5px 0; */
+  display:flex;
+  justify-content: center;
+  color:var(--red-opaque8);
 }
 /* PAGES */
 .page-container {
@@ -136,6 +253,9 @@ div.app-main-content {
   grid-template-rows: 60px 15px 35px 15px auto;
   background-color: var(--grey-light);
   padding: 10px 20px;
+}
+.page-container:has(.user){
+  grid-template-rows: 35px 15px auto;
 }
 .page-container:has(.faq) {
   width: 90%;
@@ -328,6 +448,10 @@ div.product-details {
   div.product-details.transport {
     grid-template-rows: max(120px) max(30px) auto;
   }
+  div.product-details.user {
+    padding-top:20px;
+    grid-template-rows: max(100px) max(80px) max(30px) max(350px);
+  }
 }
 div.file-container {
   display:flex;
@@ -413,6 +537,9 @@ div.input-container select {
   border: solid 1px grey;
   border-radius: 5px;
   resize: vertical;
+}
+div.input-container textarea.disabled {
+  cursor:not-allowed;
 }
 div.input-container select {
   cursor: pointer;
@@ -520,8 +647,10 @@ div.save-reminder {
   color: green;
 }
 /* TOOLTIP */
-.toolbar-button.tooltip {
+.toolbar-button.tooltip,.navbar.tooltip {
   font-size:1.5rem;
+  font-weight:400;
+  max-height:20px;
   z-index:1000;
 }
 /* ICONS - BUTTONS */
@@ -536,8 +665,11 @@ div.save-reminder {
 }
 button.back-button {
   border: none;
-  margin-right:10px;
+  margin-right:30px;
   cursor: pointer;
+}
+.page-header button.back-button {
+  margin-right: 10px;
 }
 button.back-button .fa-solid {
   color:var(--blue)

@@ -1,7 +1,8 @@
 import {useState, useEffect} from "react";
+import BackButton from "./BackButton.jsx";
 import {Tooltip} from "react-tooltip";
 
-function Toolbar({status, onHandleSave, onHandleUndo}) {
+function Toolbar({back, status, onHandleSave, onHandleUndo}) {
   const [width, setWidth] = useState(window.innerWidth);
   useEffect(() => {
     function handleResize() {
@@ -14,6 +15,8 @@ function Toolbar({status, onHandleSave, onHandleUndo}) {
   });
   return (
     <div className="toolbar-container">
+      {" "}
+      {back && <BackButton></BackButton>}
       <a className="tooltip-anchor-undo">
         <Tooltip
           className="toolbar-button tooltip"

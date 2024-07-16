@@ -4,12 +4,14 @@ import {
   strToDate,
   getFormattedDate,
   isValidDateTime,
+  isValidInteger,
 } from "./utilityFunctions";
 
 function TextInput({
   name,
   label,
   type,
+  disabled,
   required,
   value,
   rows,
@@ -49,6 +51,13 @@ function TextInput({
     switch (format) {
       case "text":
         break;
+      case "integer":
+        if (!isValidInteger(value))
+          result = {
+            valid: false,
+            msg: <span>Nombre entier non valide !</span>,
+          };
+        break;
       case "date":
         if (!isValidDate(value))
           result = {
@@ -79,9 +88,12 @@ function TextInput({
       <label>{`${label}${required ? " *" : ""}`}</label>
       {type === "textarea" && (
         <textarea
-          className={`text ${fieldValid ? "valid" : "not-valid"}`}
+          className={`text ${disabled ? "disabled" : ""} ${
+            fieldValid ? "valid" : "not-valid"
+          }`}
           placeholder={placeholder}
           value={data}
+          disabled={disabled}
           onChange={(e) => {
             setDirty(true);
             setData(e.target.value);
