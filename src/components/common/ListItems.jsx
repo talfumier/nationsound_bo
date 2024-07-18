@@ -1,4 +1,5 @@
 import {useState, useEffect, useContext} from "react";
+import {useCookies} from "react-cookie";
 import _ from "lodash";
 import {getEntities, deleteEntity} from "../../services/httpEntities.js";
 import SelectionContext from "../../services/context/SelectionContext.js";
@@ -14,13 +15,14 @@ function ListItems({entity, master, url}) {
   const contextSelection = useContext(SelectionContext);
   const contextImages = useContext(ImagesContext);
   const abortController = new AbortController();
+  const [cookies, setCookie, removeCookie] = useCookies(["user"]);
 
   const [items, setItems] = useState([]);
   const [comboData, setComboData] = useState({artists: [], pois: []});
   useEffect(() => {
     async function loadData(signal) {
       try {
-        const {data: res} = await getEntities(entity.name, null, signal);
+        const {data: res} = await getEntities(entity.name, signal);
         setItems(
           _.orderBy(
             res.data.map((item) => {
@@ -38,8 +40,8 @@ function ListItems({entity, master, url}) {
         );
         //load artists and pois data
         if (entity.name === "event") {
-          const {data: res1} = await getEntities("artist", null, signal);
-          const {data: res2} = await getEntities("poi", null, signal);
+          const {data: res1} = await getEntities("artist", signal);
+          const {data: res2} = await getEntities("poi", signal);
           setComboData({artists: res1.data, pois: res2.data});
         }
       } catch (error) {
@@ -56,7 +58,7 @@ function ListItems({entity, master, url}) {
       const {data: res} = await deleteEntity(
         entity.name,
         id,
-        null,
+        cookies.user,
         abortController.signal
       ); //associated files (if any) deleted as well
       if (entity.fileYes)

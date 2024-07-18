@@ -17,7 +17,7 @@ function NavBar() {
   ];
   return (
     <nav className="navbar">
-      <NavLink to="/profile/1">
+      <NavLink to="/users/1">
         <Tooltip
           className="navbar tooltip"
           anchorSelect=".avatar-anchor"

@@ -1,6 +1,8 @@
 import {useState, Fragment} from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
+import {useCookies} from "react-cookie";
 import _ from "lodash";
+import {decodeJWT} from "./services/httpUsers.js";
 import Header from "./components/header/Header.jsx";
 import NavBar from "./components/navbar/NavBar.jsx";
 import Home from "./components/home/Home.jsx";
@@ -17,8 +19,13 @@ import "./css/global.css";
 import "./css/normalize.css";
 import "react-toastify/dist/ReactToastify.css";
 import ContainerToast from "./components/common/toastSwal/ContainerToast.jsx";
+import FormLogin from "./components/login/FormLogin.jsx";
 
 function App() {
+  const [cookies, setCookie, removeCookie] = useCookies(["user"]);
+
+  const currentUser = cookies.user ? decodeJWT(cookies.user) : null;
+  console.log(currentUser);
   const [user, setUser] = useState({});
   const [selected, setSelected] = useState({});
   const [containers, setContainers] = useState([]);
@@ -61,59 +68,55 @@ function App() {
       {/* wrapper necessary for sticky footer*/}
       <div className="app-wrapper">
         <div className="app-main-content">
-          <BrowserRouter>
-            <NavBar></NavBar>
-            <UserContext.Provider value={{user, onHandleUser: handleUser}}>
-              <SelectionContext.Provider
-                value={{selected, onHandleSelected: handleSelected}}
-              >
-                <ImagesContext.Provider
-                  value={{containers, onHandleImages: handleImages}}
+          <FormLogin></FormLogin>
+          {cookies.user && (
+            <BrowserRouter>
+              <NavBar></NavBar>
+              <UserContext.Provider value={{user, onHandleUser: handleUser}}>
+                <SelectionContext.Provider
+                  value={{selected, onHandleSelected: handleSelected}}
                 >
-                  <Routes>
-                    <Route path="/" element={<Home></Home>}></Route>
-                    {Object.keys(formContent).map((key) => {
-                      let master = getMaster(formContent[key].fields);
-                      return (
-                        <Fragment key={key}>
-                          <Route
-                            path={`/${key}s`}
-                            element={
-                              <ListItems
-                                entity={formContent[key].entity}
-                                master={master}
-                                url={`/${key}s`}
-                              ></ListItems>
-                            }
-                          ></Route>
-                          <Route
-                            path={`/${key}s/:id`}
-                            element={
-                              <FormDetails
-                                entity={formContent[key].entity}
-                                fields={formContent[key].fields}
-                              ></FormDetails>
-                            }
-                          ></Route>
-                        </Fragment>
-                      );
-                    })}
-                    <Route
-                      path={`/profile/:id`}
-                      element={
-                        <FormDetails
-                          entity={formContent.user.entity}
-                          fields={formContent.user.fields}
-                        ></FormDetails>
-                      }
-                    ></Route>
-                    <Route path="*" element={<NotFound></NotFound>}></Route>
-                  </Routes>
-                </ImagesContext.Provider>
-              </SelectionContext.Provider>
-            </UserContext.Provider>
-            <ContainerToast></ContainerToast>
-          </BrowserRouter>
+                  <ImagesContext.Provider
+                    value={{containers, onHandleImages: handleImages}}
+                  >
+                    <Routes>
+                      <Route path="/" element={<Home></Home>}></Route>
+                      {Object.keys(formContent).map((key) => {
+                        let master = getMaster(formContent[key].fields);
+                        return (
+                          <Fragment key={key}>
+                            {!formContent[key].entity.noList && (
+                              <Route
+                                path={`/${key}s`}
+                                element={
+                                  <ListItems
+                                    entity={formContent[key].entity}
+                                    master={master}
+                                    url={`/${key}s`}
+                                  ></ListItems>
+                                }
+                              ></Route>
+                            )}
+                            <Route
+                              path={`/${key}s/:id`}
+                              element={
+                                <FormDetails
+                                  entity={formContent[key].entity}
+                                  fields={formContent[key].fields}
+                                ></FormDetails>
+                              }
+                            ></Route>
+                          </Fragment>
+                        );
+                      })}
+                      <Route path="*" element={<NotFound></NotFound>}></Route>
+                    </Routes>
+                  </ImagesContext.Provider>
+                </SelectionContext.Provider>
+              </UserContext.Provider>
+            </BrowserRouter>
+          )}
+          <ContainerToast></ContainerToast>
         </div>
       </div>
     </>

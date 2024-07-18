@@ -1,6 +1,7 @@
 import {useEffect, useState, useContext} from "react";
 import {useLocation} from "react-router-dom";
 import {useParams} from "react-router-dom";
+import {useCookies} from "react-cookie";
 import _ from "lodash";
 import SelectionContext from "../../services/context/SelectionContext.js";
 import ImagesContext from "../../services/context/ImagesContext.js";
@@ -35,6 +36,7 @@ function FormDetails({entity, fields}) {
   const location = useLocation();
   const abortController = new AbortController();
   const signal = abortController.signal;
+  const [cookies, setCookie, removeCookie] = useCookies(["user"]);
   const [reset, setReset] = useState(0);
   function initFormValid() {
     fields.map((field) => {
@@ -62,7 +64,7 @@ function FormDetails({entity, fields}) {
     }
     async function loadData(signal) {
       try {
-        const {data: res} = await getEntity(entity.name, id, null, signal);
+        const {data: res} = await getEntity(entity.name, id, signal);
         setFieldData(res.data);
       } catch (error) {}
     }
@@ -178,13 +180,13 @@ function FormDetails({entity, fields}) {
     });
     if (!bl && fieldData.files_id) {
       try {
-        await deleteContainer(fieldData.files_id, null, signal); //delete file container in API (mongoDB)
+        await deleteContainer(fieldData.files_id, cookies.user, signal); //delete file container in API (mongoDB)
         contextImages.onHandleImages(fieldData.files_id, "remove");
         await patchEntity(
           entity.name,
           fieldData.id,
           {files_id: null},
-          null,
+          cookies.user,
           signal
         ); //update field data in API (MySQL)
         updatedData.files_id = null;
@@ -203,7 +205,7 @@ function FormDetails({entity, fields}) {
           await updateContainer(
             fieldData.files_id,
             {files: body},
-            null,
+            cookies.user,
             signal
           );
           if (entity.fileYes.includes("image"))
@@ -214,7 +216,11 @@ function FormDetails({entity, fields}) {
             );
         } else {
           //no existing file container
-          const {data: res} = await postContainer({files: body}, null, signal);
+          const {data: res} = await postContainer(
+            {files: body},
+            cookies.user,
+            signal
+          );
           if (entity.fileYes.includes("image"))
             contextImages.onHandleImages(
               null,
@@ -236,12 +242,13 @@ function FormDetails({entity, fields}) {
           const {data: res} = await postEntity(
             entity.name,
             updatedData,
-            null,
+            cookies.user,
             signal
           );
           updatedData.id = res.data.id;
           contextSelection.onHandleSelected(entity.name, updatedData.id, true);
-        } else await patchEntity(entity.name, id, updatedData, null, signal);
+        } else
+          await patchEntity(entity.name, id, updatedData, cookies.user, signal);
         setFieldData({...fieldData, ...updatedData}); //update fieldData local state
       } catch (error) {
         //catching errors handled by axios interceptors in httpService.js
@@ -314,6 +321,13 @@ function FormDetails({entity, fields}) {
             ></TextInput>
           );
         })}
+        {entity.noList.includes("users") && (
+          <div className="input-container">
+            <button className="btn btn-info pwd-reset">
+              Changer le mot de passe
+            </button>
+          </div>
+        )}
         {entity.fileYes.includes("umap") && (
           <a
             target="_blank"

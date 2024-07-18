@@ -5,6 +5,8 @@ import {
   getFormattedDate,
   isValidDateTime,
   isValidInteger,
+  isValidEmail,
+  isValidPwd,
 } from "./utilityFunctions";
 
 function TextInput({
@@ -18,6 +20,7 @@ function TextInput({
   options,
   placeholder,
   format,
+  equal,
   onHandleChange,
 }) {
   const [data, setData] = useState("");
@@ -34,9 +37,21 @@ function TextInput({
     }
     const dta = fmt ? getFormattedDate(value, fmt) : value;
     setData(dta);
-    if (required) setFieldValid({valid: validate(dta).valid, msg: null});
   }, [value]);
-
+  function handleChange(e) {
+    setDirty(true);
+    setData(e.target.value);
+    let valid = {valid: true, msg: null};
+    if (required) valid = validate(e.target.value);
+    onHandleChange(
+      name,
+      valid.valid,
+      format !== "date" && format !== "date-time"
+        ? e.target.value
+        : strToDate(e.target.value)
+    );
+    setFieldValid(valid);
+  }
   function validate(value) {
     if (!value || value.length === 0)
       return {
@@ -50,6 +65,31 @@ function TextInput({
     let result = {valid: true, msg: null};
     switch (format) {
       case "text":
+      case "password-not-null":
+        if (equal && value !== equal)
+          result = {
+            valid: false,
+            msg: <span>Les mots de passe saisis sont différents !</span>,
+          };
+        break;
+      case "email":
+        if (!isValidEmail(value))
+          result = {
+            valid: false,
+            msg: <span>Email non valide !</span>,
+          };
+        break;
+      case "password":
+        if (!isValidPwd(value))
+          result = {
+            valid: false,
+            msg: (
+              <span>
+                Mot de passe non valide {">>>"} 8 caractères minimum incluant au
+                moins un caractère spécial, une majuscule, un chiffre !
+              </span>
+            ),
+          };
         break;
       case "integer":
         if (!isValidInteger(value))
@@ -86,34 +126,39 @@ function TextInput({
   return (
     <div className="input-container">
       <label>{`${label}${required ? " *" : ""}`}</label>
-      {type === "textarea" && (
-        <textarea
+      {type === "input" && (
+        <input
+          type={
+            format !== undefined
+              ? format.includes("password")
+                ? "password"
+                : format
+              : "text"
+          }
           className={`text ${disabled ? "disabled" : ""} ${
-            fieldValid ? "valid" : "not-valid"
+            fieldValid.valid ? "valid" : "not-valid"
           }`}
           placeholder={placeholder}
           value={data}
           disabled={disabled}
-          onChange={(e) => {
-            setDirty(true);
-            setData(e.target.value);
-            let valid = {valid: true, msg: null};
-            if (required) valid = validate(e.target.value);
-            onHandleChange(
-              name,
-              valid.valid,
-              format !== "date" && format !== "date-time"
-                ? e.target.value
-                : strToDate(e.target.value)
-            );
-            setFieldValid(valid);
-          }}
+          onChange={handleChange}
+        />
+      )}
+      {type === "textarea" && (
+        <textarea
+          className={`text ${disabled ? "disabled" : ""} ${
+            fieldValid.valid ? "valid" : "not-valid"
+          }`}
+          placeholder={placeholder}
+          value={data}
+          disabled={disabled}
+          onChange={handleChange}
           rows={rows}
         />
       )}
       {type === "select" && (
         <select
-          className={`text ${fieldValid ? "valid" : "not-valid"}`}
+          className={`text ${fieldValid.valid ? "valid" : "not-valid"}`}
           onChange={(e) => {
             setDirty(true);
             setData(e.target.value);

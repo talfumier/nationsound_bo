@@ -1,5 +1,27 @@
 import {parseISO, format, isDate} from "date-fns";
 import _ from "lodash";
+import Joi from "joi";
+import {joiPasswordExtendCore} from "joi-password";
+export function isValidEmail(email) {
+  const schema = Joi.object({
+    email: Joi.string().email({tlds: {allow: false}}),
+  });
+  return !schema.validate({email}).error;
+}
+export function isValidPwd(pwd) {
+  const joiPassword = Joi.extend(joiPasswordExtendCore);
+  const schema = Joi.object({
+    pwd: joiPassword
+      .string()
+      .min(8)
+      .max(60)
+      .minOfSpecialCharacters(1)
+      .minOfUppercase(1)
+      .minOfNumeric(1)
+      .noWhiteSpaces(),
+  });
+  return !schema.validate({pwd}).error;
+}
 export function isValidInteger(str) {
   if (str.toString().includes(".") || str.toString().includes(","))
     return false;
