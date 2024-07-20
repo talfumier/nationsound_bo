@@ -142,6 +142,8 @@ function TextInput({
           value={data}
           disabled={disabled}
           onChange={handleChange}
+          name={name}
+          autoComplete="on"
         />
       )}
       {type === "textarea" && (
@@ -150,10 +152,12 @@ function TextInput({
             fieldValid.valid ? "valid" : "not-valid"
           }`}
           placeholder={placeholder}
-          value={data}
+          value={data === null ? "" : data}
           disabled={disabled}
           onChange={handleChange}
           rows={rows}
+          name={name}
+          autoComplete="on"
         />
       )}
       {type === "select" && (

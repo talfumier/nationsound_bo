@@ -1,7 +1,22 @@
+import {useEffect, useState, useContext} from "react";
 import {NavLink} from "react-router-dom";
+import {useCookies} from "react-cookie";
+import _ from "lodash";
+import {getContainerById} from "../../services/httpFiles.jsx";
 import {Tooltip} from "react-tooltip";
+import {decodeJWT} from "../../services/httpUsers.js";
+import ImagesContext from "../../services/context/ImagesContext.js";
 
 function NavBar() {
+  const [cookies, setCookie, removeCookie] = useCookies(["user"]);
+  const currentUser = cookies.user ? decodeJWT(cookies.user) : null;
+
+  const contextImages = useContext(ImagesContext);
+
+  const abortController = new AbortController();
+  const signal = abortController.signal;
+  const [avatar, setAvatar] = useState([]);
+
   const items = [
     ["/", "Accueil"],
     ["/messages", "Messages"],
@@ -15,9 +30,37 @@ function NavBar() {
     ["/maps", "Carte"],
     ["/logos", "Logo"],
   ];
+  useEffect(() => {
+    async function loadAvatar() {
+      let file = null;
+      if (currentUser.files_id) {
+        const {data: res} = await getContainerById(
+          currentUser.files_id,
+          signal
+        );
+        contextImages.onHandleImages(null, res.data, "add");
+        file = _.filter(res.data.files, (img) => {
+          return img.main === true;
+        })[0];
+      }
+      if (file) setAvatar(["file", file.data]);
+      else {
+        const str = Array.from(
+          (currentUser.first_Name
+            ? currentUser.first_Name
+            : currentUser.email
+          ).substring(0, 2)
+        );
+        str[0] = str[0].toUpperCase();
+        str[1] = str[1].toLowerCase();
+        setAvatar(["text", str.join("")]);
+      }
+    }
+    loadAvatar();
+  }, []);
   return (
     <nav className="navbar">
-      <NavLink to="/users/1">
+      <NavLink to={`/users/${currentUser.id}`}>
         <Tooltip
           className="navbar tooltip"
           anchorSelect=".avatar-anchor"
@@ -25,8 +68,29 @@ function NavBar() {
           variant="info"
           content="Profil utilisateur"
         />
-        <div className="avatar avatar-anchor">HT</div>
+        <div className="avatar avatar-anchor">
+          {avatar[0] === "text" ? (
+            avatar[1]
+          ) : (
+            <img src={avatar[1]} alt=""></img>
+          )}
+        </div>
       </NavLink>
+      {currentUser.role === "admin" && (
+        <>
+          <hr></hr>
+          <NavLink key={-1} to="/accounts">
+            <Tooltip
+              className="navbar tooltip"
+              anchorSelect=".menu-admin"
+              place="bottom"
+              variant="info"
+              content="Réservé à l'administrateur: gestion des comptes."
+            />
+            <p className="menu-admin">Comptes</p>
+          </NavLink>
+        </>
+      )}
       <hr></hr>
       {items.map((item, idx) => {
         return (

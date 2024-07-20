@@ -12,6 +12,10 @@ import {getFormattedDate} from "./utilityFunctions.js";
 
 function ListItems({entity, master, url}) {
   // entity > {name:"artist",label:"Artiste",labels:"Artistes",fileYes}
+  function getEntityName() {
+    if (entity.name === "account") return "user";
+    return entity.name;
+  }
   const contextSelection = useContext(SelectionContext);
   const contextImages = useContext(ImagesContext);
   const abortController = new AbortController();
@@ -22,14 +26,18 @@ function ListItems({entity, master, url}) {
   useEffect(() => {
     async function loadData(signal) {
       try {
-        const {data: res} = await getEntities(entity.name, signal);
+        const {data: res} = await getEntities(
+          getEntityName(),
+          cookies.user,
+          signal
+        );
         setItems(
           _.orderBy(
             res.data.map((item) => {
               return {
                 ...item,
                 active:
-                  contextSelection.selected[entity.name] === item.id
+                  contextSelection.selected[getEntityName()] === item.id
                     ? true
                     : false,
               };
@@ -39,9 +47,13 @@ function ListItems({entity, master, url}) {
           )
         );
         //load artists and pois data
-        if (entity.name === "event") {
-          const {data: res1} = await getEntities("artist", signal);
-          const {data: res2} = await getEntities("poi", signal);
+        if (getEntityName() === "event") {
+          const {data: res1} = await getEntities(
+            "artist",
+            cookies.user,
+            signal
+          );
+          const {data: res2} = await getEntities("poi", cookies.user, signal);
           setComboData({artists: res1.data, pois: res2.data});
         }
       } catch (error) {
@@ -56,14 +68,14 @@ function ListItems({entity, master, url}) {
   async function handleDelete(id) {
     try {
       const {data: res} = await deleteEntity(
-        entity.name,
+        getEntityName(),
         id,
         cookies.user,
         abortController.signal
       ); //associated files (if any) deleted as well
       if (entity.fileYes)
         contextImages.onHandleImages(res.data.files_id, null, "remove");
-      contextSelection.onHandleSelected(entity.name, -1, false);
+      contextSelection.onHandleSelected(getEntityName(), -1, false);
       setItems(
         _.filter(items, (item) => {
           return item.id !== id;
@@ -75,6 +87,22 @@ function ListItems({entity, master, url}) {
     }
   }
   function getLabel(item) {
+    if (url.includes("account"))
+      return (
+        <div className="account">
+          <span>{item[master[0].name]}</span>
+          <div>
+            <span>
+              {item[master[1].name] === "editor"
+                ? "éditeur"
+                : item[master[1].name]}
+            </span>
+            <span className={item[master[2].name] ? "valid" : "not-valid"}>
+              {item[master[2].name] ? "validé" : "non validé"}
+            </span>
+          </div>
+        </div>
+      );
     if (url.includes("date"))
       return (
         <div>
@@ -127,7 +155,11 @@ function ListItems({entity, master, url}) {
                   data.map((it) => {
                     return (it.active = it.id === item.id ? ckd : false);
                   });
-                  contextSelection.onHandleSelected(entity.name, item.id, ckd);
+                  contextSelection.onHandleSelected(
+                    getEntityName(),
+                    item.id,
+                    ckd
+                  );
                   setItems(data);
                 }}
               ></CheckBox>

@@ -1,4 +1,4 @@
-import {useState, Fragment} from "react";
+import {useState, Fragment, useEffect} from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import {useCookies} from "react-cookie";
 import _ from "lodash";
@@ -11,7 +11,6 @@ import FormDetails from "./components/common/FormDetails.jsx";
 import formContent from "./components/common/formContent.json";
 import NotFound from "./components/notFound/NotFound.jsx";
 
-import UserContext from "./services/context/UserContext";
 import SelectionContext from "./services/context/SelectionContext.js";
 import ImagesContext from "./services/context/ImagesContext";
 
@@ -23,16 +22,15 @@ import FormLogin from "./components/login/FormLogin.jsx";
 
 function App() {
   const [cookies, setCookie, removeCookie] = useCookies(["user"]);
-
   const currentUser = cookies.user ? decodeJWT(cookies.user) : null;
-  console.log(currentUser);
-  const [user, setUser] = useState({});
+  useEffect(() => {
+    if (!currentUser) return;
+    if (currentUser.role !== "admin") delete formContent.account;
+  }, [currentUser]);
+
   const [selected, setSelected] = useState({});
   const [containers, setContainers] = useState([]);
 
-  function handleUser(data) {
-    setUser(data);
-  }
   function handleSelected(cs, id, ckd) {
     setSelected({...selected, [cs]: ckd ? id : null});
   }
@@ -71,49 +69,47 @@ function App() {
           <FormLogin></FormLogin>
           {cookies.user && (
             <BrowserRouter>
-              <NavBar></NavBar>
-              <UserContext.Provider value={{user, onHandleUser: handleUser}}>
-                <SelectionContext.Provider
-                  value={{selected, onHandleSelected: handleSelected}}
+              <SelectionContext.Provider
+                value={{selected, onHandleSelected: handleSelected}}
+              >
+                <ImagesContext.Provider
+                  value={{containers, onHandleImages: handleImages}}
                 >
-                  <ImagesContext.Provider
-                    value={{containers, onHandleImages: handleImages}}
-                  >
-                    <Routes>
-                      <Route path="/" element={<Home></Home>}></Route>
-                      {Object.keys(formContent).map((key) => {
-                        let master = getMaster(formContent[key].fields);
-                        return (
-                          <Fragment key={key}>
-                            {!formContent[key].entity.noList && (
-                              <Route
-                                path={`/${key}s`}
-                                element={
-                                  <ListItems
-                                    entity={formContent[key].entity}
-                                    master={master}
-                                    url={`/${key}s`}
-                                  ></ListItems>
-                                }
-                              ></Route>
-                            )}
+                  <NavBar></NavBar>
+                  <Routes>
+                    <Route path="/" element={<Home></Home>}></Route>
+                    {Object.keys(formContent).map((key) => {
+                      let master = getMaster(formContent[key].fields);
+                      return (
+                        <Fragment key={key}>
+                          {!formContent[key].entity.noList && (
                             <Route
-                              path={`/${key}s/:id`}
+                              path={`/${key}s`}
                               element={
-                                <FormDetails
+                                <ListItems
                                   entity={formContent[key].entity}
-                                  fields={formContent[key].fields}
-                                ></FormDetails>
+                                  master={master}
+                                  url={`/${key}s`}
+                                ></ListItems>
                               }
                             ></Route>
-                          </Fragment>
-                        );
-                      })}
-                      <Route path="*" element={<NotFound></NotFound>}></Route>
-                    </Routes>
-                  </ImagesContext.Provider>
-                </SelectionContext.Provider>
-              </UserContext.Provider>
+                          )}
+                          <Route
+                            path={`/${key}s/:id`}
+                            element={
+                              <FormDetails
+                                entity={formContent[key].entity}
+                                fields={formContent[key].fields}
+                              ></FormDetails>
+                            }
+                          ></Route>
+                        </Fragment>
+                      );
+                    })}
+                    <Route path="*" element={<NotFound></NotFound>}></Route>
+                  </Routes>
+                </ImagesContext.Provider>
+              </SelectionContext.Provider>
             </BrowserRouter>
           )}
           <ContainerToast></ContainerToast>

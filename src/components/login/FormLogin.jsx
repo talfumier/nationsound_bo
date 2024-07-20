@@ -63,6 +63,7 @@ function FormLogin(props) {
           case false: //login case
             res = await login(data.data.user_id, data.data.password);
             const {exp} = decodeJWT(res.headers["x-auth-token"]); //exp is expressed in seconds since EPOCH
+
             setCookie("user", res.headers["x-auth-token"], {
               path: "/",
               expires: new Date(exp * 1000),
@@ -73,7 +74,7 @@ function FormLogin(props) {
   }
   return (
     !cookies.user && (
-      <div id="modal" className="modal">
+      <div className="modal">
         <div className="modal-content">
           {fields.map((field, idx) => {
             return (

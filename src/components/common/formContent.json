@@ -374,5 +374,58 @@
         "required": false
       }
     ]
+  },
+  "account": {
+    "entity": {
+      "name": "account",
+      "label": "Compte",
+      "labels": "Comptes",
+      "fileYes": "image/png, image/jpeg, image/webp",
+      "orderBy": {"field": "last_name", "order": "asc"}
+    },
+    "fields": [
+      {
+        "name": "last_name",
+        "label": "Nom de famille",
+        "type": "textarea",
+        "rows": 2,
+        "required": false
+      },
+      {
+        "name": "first_name",
+        "label": "Prénom",
+        "type": "textarea",
+        "rows": 2,
+        "required": false
+      },
+      {
+        "name": "email",
+        "label": "Email",
+        "type": "textarea",
+        "rows": 2,
+        "format": "email",
+        "listMaster": true
+      },
+      {
+        "name": "role",
+        "label": "Role",
+        "type": "select",
+        "options": [
+          ["editor", "éditeur"],
+          ["admin", "administrateur"]
+        ],
+        "listMaster": true
+      },
+      {
+        "name": "validated",
+        "label": "Compte Validé",
+        "type": "textarea",
+        "format": "date-time",
+        "disabled": true,
+        "rows": 1,
+        "required": false,
+        "listMaster": true
+      }
+    ]
   }
 }

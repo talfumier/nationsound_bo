@@ -32,6 +32,7 @@ function FormDetails({entity, fields}) {
   // entity > {name:"artist",label:"Artiste",labels:"Artistes",fileYes, noList}
   if (!entity.fileYes) entity.fileYes = "";
   if (!entity.noList) entity.noList = "";
+
   const {id} = useParams(); //route parameter
   const location = useLocation();
   const abortController = new AbortController();
@@ -64,7 +65,12 @@ function FormDetails({entity, fields}) {
     }
     async function loadData(signal) {
       try {
-        const {data: res} = await getEntity(entity.name, id, signal);
+        const {data: res} = await getEntity(
+          entity.name,
+          cookies.user,
+          id,
+          signal
+        );
         setFieldData(res.data);
       } catch (error) {}
     }
@@ -112,9 +118,11 @@ function FormDetails({entity, fields}) {
           original = new Date(original).setHours(0, 0, 0, 0);
           break;
         case "date-time":
-          modified = modified.getTime();
+          modified = modified ? modified.getTime() : null;
           original = new Date(original).getTime();
       }
+      if (!modified) modified = "";
+      if (!original) original = "";
       return !_.isEqual(modified, original);
     }
     formValid[name] = fieldValid;
@@ -289,8 +297,15 @@ function FormDetails({entity, fields}) {
       <Toolbar
         back={entity.noList ? true : false}
         status={toolbarStatus}
+        del={entity.name === "user" ? true : false}
+        account={
+          entity.name === "account" ? {validated: fieldData.validated} : false
+        }
         onHandleSave={handleSave}
         onHandleUndo={handleUndo}
+        onHandleAccountValidation={(value) => {
+          handleChange("validated", "date-time", true, value);
+        }}
       ></Toolbar>
       <hr />
       <div className={`product-details ${entity.name}`}>
