@@ -19,8 +19,18 @@ import "./css/normalize.css";
 import "react-toastify/dist/ReactToastify.css";
 import ContainerToast from "./components/common/toastSwal/ContainerToast.jsx";
 import FormLogin from "./components/login/FormLogin.jsx";
+import FormRecover from "./components/login/FormRecover.jsx";
+import LegalNotice from "./components/legal-notice/LegalNotice.jsx";
 
 function App() {
+  const location = window.location;
+  const urlParams = new URLSearchParams(location.search);
+  const resetPwd = {
+    value: location.pathname.includes("resetpassword"),
+    id: urlParams.get("id"),
+    random: urlParams.get("random"),
+  };
+
   const [cookies, setCookie, removeCookie] = useCookies(["user"]);
   const currentUser = cookies.user ? decodeJWT(cookies.user) : null;
   useEffect(() => {
@@ -61,61 +71,74 @@ function App() {
     });
   }
   return (
-    <>
+    <BrowserRouter>
       <Header></Header>
-      {/* wrapper necessary for sticky footer*/}
       <div className="app-wrapper">
         <div className="app-main-content">
-          <FormLogin></FormLogin>
+          {!cookies.user && !resetPwd.value && <FormLogin></FormLogin>}
+          {!cookies.user && resetPwd.value && (
+            <FormRecover id={resetPwd.id} token={resetPwd.random}></FormRecover> //forgot password case
+          )}
           {cookies.user && (
-            <BrowserRouter>
-              <SelectionContext.Provider
-                value={{selected, onHandleSelected: handleSelected}}
+            <SelectionContext.Provider
+              value={{selected, onHandleSelected: handleSelected}}
+            >
+              <ImagesContext.Provider
+                value={{containers, onHandleImages: handleImages}}
               >
-                <ImagesContext.Provider
-                  value={{containers, onHandleImages: handleImages}}
-                >
-                  <NavBar></NavBar>
-                  <Routes>
-                    <Route path="/" element={<Home></Home>}></Route>
-                    {Object.keys(formContent).map((key) => {
-                      let master = getMaster(formContent[key].fields);
-                      return (
-                        <Fragment key={key}>
-                          {!formContent[key].entity.noList && (
-                            <Route
-                              path={`/${key}s`}
-                              element={
-                                <ListItems
-                                  entity={formContent[key].entity}
-                                  master={master}
-                                  url={`/${key}s`}
-                                ></ListItems>
-                              }
-                            ></Route>
-                          )}
+                {!resetPwd.id && <NavBar></NavBar>}
+                <Routes>
+                  <Route path="/" element={<Home></Home>}></Route>
+                  {Object.keys(formContent).map((key) => {
+                    let master = getMaster(formContent[key].fields);
+                    return (
+                      <Fragment key={key}>
+                        {!formContent[key].entity.noList && (
                           <Route
-                            path={`/${key}s/:id`}
+                            path={`/${key}s`}
                             element={
-                              <FormDetails
+                              <ListItems
                                 entity={formContent[key].entity}
-                                fields={formContent[key].fields}
-                              ></FormDetails>
+                                master={master}
+                                url={`/${key}s`}
+                              ></ListItems>
                             }
                           ></Route>
-                        </Fragment>
-                      );
-                    })}
-                    <Route path="*" element={<NotFound></NotFound>}></Route>
-                  </Routes>
-                </ImagesContext.Provider>
-              </SelectionContext.Provider>
-            </BrowserRouter>
+                        )}
+                        <Route
+                          path={`/${key}s/:id`}
+                          element={
+                            <FormDetails
+                              entity={formContent[key].entity}
+                              fields={formContent[key].fields}
+                            ></FormDetails>
+                          }
+                        ></Route>
+                      </Fragment>
+                    );
+                  })}
+                  <Route
+                    path="/legal-notice"
+                    element={<LegalNotice></LegalNotice>}
+                  ></Route>
+                  <Route
+                    path="/resetpassword" //used for requesting a new password when user is logged in
+                    element={
+                      <FormRecover
+                        id={resetPwd.id}
+                        token={resetPwd.random}
+                      ></FormRecover>
+                    }
+                  ></Route>
+                  <Route path="*" element={<NotFound></NotFound>}></Route>
+                </Routes>
+              </ImagesContext.Provider>
+            </SelectionContext.Provider>
           )}
-          <ContainerToast></ContainerToast>
         </div>
+        <ContainerToast></ContainerToast>
       </div>
-    </>
+    </BrowserRouter>
   );
 }
 

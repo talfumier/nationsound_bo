@@ -1,13 +1,30 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {useCookies} from "react-cookie";
 import _ from "lodash";
 import {translate} from "../../services/httpGoogleServices.js";
-import {login, register, decodeJWT} from "../../services/httpUsers.js";
+import {
+  login,
+  register,
+  forgotPassword,
+  decodeJWT,
+} from "../../services/httpUsers.js";
 import TextInput from "../common/TextInput.jsx";
 import CheckBox from "../common/CheckBox.jsx";
 import {toastInfo} from "../common/toastSwal/ToastMessages.js";
+import {isValidPwd} from "../common/utilityFunctions.js";
 
-function FormLogin(props) {
+export async function requestNewPwd(email) {
+  try {
+    const {data: res} = await forgotPassword(window.location.origin, email);
+    const text = await translate({
+      text: res.message,
+      to: "fr",
+    });
+    toastInfo(text);
+  } catch (error) {}
+}
+
+function FormLogin() {
   const fields = [
     {
       name: "user_id",
@@ -22,7 +39,7 @@ function FormLogin(props) {
       format: "password-not-null",
     },
     {
-      name: "password-check",
+      name: "password-match",
       label: "vérification du mot de passe",
       type: "input",
       format: "password-not-null",
@@ -30,19 +47,24 @@ function FormLogin(props) {
   ];
   const [cookies, setCookie, removeCookie] = useCookies(["user"]);
   const [data, setData] = useState({
-    data: {user_id: "", password: "", ["password-check"]: "", cgu_cgv: false},
+    data: {user_id: "", password: "", ["password-match"]: "", cgu_cgv: false},
     creation: false,
   });
+
   const [formValid, setFormValid] = useState({
     user_id: false,
     password: false,
-    ["password-check"]: true,
-    cgu_cgv: true,
+    ["password-match"]: data.creation ? false : true,
+    cgu_cgv: data.creation ? false : true,
   });
-  const [alert, setAlert] = useState(null);
-  function isFormValid() {
-    return JSON.stringify(formValid).indexOf(false) === -1;
-  }
+  const [disabled, setDisabled] = useState(true);
+  useEffect(() => {
+    const cond1 = JSON.stringify(formValid).indexOf(false) !== -1;
+    const cond2 = !data.creation
+      ? !isValidPwd(data.data.password)
+      : data.data.password !== data.data["password-match"];
+    setDisabled(cond1 || cond2);
+  }, [data, formValid]);
   async function handleSubmit() {
     try {
       if (!cookies.user) {
@@ -73,85 +95,87 @@ function FormLogin(props) {
     } catch (error) {}
   }
   return (
-    !cookies.user && (
-      <div className="modal">
-        <div className="modal-content">
-          {fields.map((field, idx) => {
-            return (
-              (idx !== 2 ? true : data.creation ? true : false) && (
-                <TextInput
-                  key={field.name}
-                  name={field.name}
-                  label={field.label}
-                  type={field.type}
-                  disabled={false}
-                  required={true}
-                  value=""
-                  placeholder={null}
-                  format={field.format ? field.format : "text"}
-                  equal={idx === 2 ? data.data.password : undefined}
-                  onHandleChange={(name, valid, value) => {
-                    const dta = _.cloneDeep(data);
-                    dta.data[name] = value;
-                    setData(dta);
-                    setFormValid({...formValid, [name]: valid});
-                  }}
-                ></TextInput>
-              )
-            );
-          })}
-          {data.creation && (
-            <CheckBox
-              label={
-                <div className="link-CGU-CGV">
-                  J'ai lu et accepte les{" "}
-                  <a href="/CGU-CGV" target="_blank">
-                    termes et conditions
-                  </a>
-                </div>
-              }
-              onHandleChange={(ckd) => {
-                const dta = _.cloneDeep(data);
-                dta.data["cgu_cgv"] = ckd;
-                setData({...data, cgu_cgv: ckd});
-                setFormValid({...formValid, cgu_cgv: ckd});
-              }}
-            ></CheckBox>
-          )}
-          <button
-            className={`btn btn-info connect ${
-              !isFormValid() ? "disabled" : ""
-            }`}
-            onClick={() => {
-              if (!isFormValid()) return;
-              handleSubmit();
-            }}
-          >
-            {data.creation ? "S'ENREGISTRER" : "SE CONNECTER"}
-          </button>
-          {!data.creation && (
-            <div className="bottom-actions">
-              <div className="action forgot-pwd ">mot de passe oublié ?</div>
-              <div
-                className="action no-account"
-                onClick={() => {
-                  setData({...data, creation: true});
-                  setFormValid({
-                    ...formValid,
-                    ["password-check"]: false,
-                    cgu_cgv: false,
-                  });
+    <div className="modal">
+      <div className="modal-content">
+        {fields.map((field, idx) => {
+          return (
+            (idx !== 2 ? true : data.creation ? true : false) && (
+              <TextInput
+                key={field.name}
+                name={field.name}
+                label={field.label}
+                type={field.type}
+                disabled={false}
+                required={true}
+                value=""
+                placeholder={null}
+                format={field.format ? field.format : "text"}
+                equal={idx === 2 ? data.data.password : undefined}
+                onHandleChange={(name, valid, value) => {
+                  const dta = _.cloneDeep(data);
+                  dta.data[name] = value;
+                  setData(dta);
+                  setFormValid({...formValid, [name]: valid});
                 }}
-              >
-                pas encore de compte ?
+                onHandleBlur={() => {}} //does nothing but avoiding bug
+              ></TextInput>
+            )
+          );
+        })}
+        {data.creation && (
+          <CheckBox
+            label={
+              <div className="link-CGU-CGV">
+                J'ai lu et accepte les{" "}
+                <a href="/CGU-CGV" target="_blank">
+                  termes et conditions
+                </a>
               </div>
+            }
+            onHandleChange={(ckd) => {
+              const dta = _.cloneDeep(data);
+              dta.data["cgu_cgv"] = ckd;
+              setData({...data, cgu_cgv: ckd});
+              setFormValid({...formValid, cgu_cgv: ckd});
+            }}
+          ></CheckBox>
+        )}
+        <button
+          className={`btn btn-info connect ${disabled ? "disabled" : ""}`}
+          onClick={() => {
+            if (disabled) return;
+            handleSubmit();
+          }}
+        >
+          {data.creation ? "S'ENREGISTRER" : "SE CONNECTER"}
+        </button>
+        {!data.creation && (
+          <div className="bottom-actions">
+            <div
+              className="action forgot-pwd "
+              onClick={() => {
+                requestNewPwd(data.data.user_id);
+              }}
+            >
+              mot de passe oublié ?
             </div>
-          )}
-          {alert ? alert : null}
-        </div>
+            <div
+              className="action no-account"
+              onClick={() => {
+                setData({...data, creation: true});
+                setFormValid({
+                  ...formValid,
+                  ["password-match"]: false,
+                  cgu_cgv: false,
+                });
+              }}
+            >
+              pas encore de compte ?
+            </div>
+          </div>
+        )}
       </div>
-    )
+    </div>
   );
 }
-
 export default FormLogin;

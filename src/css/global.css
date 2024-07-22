@@ -131,10 +131,17 @@ div.modal-content {
   max-width:350px;
 }
 div.modal-content div.input-container {
+  position:relative;
   max-width:100%;
 }
 div.modal-content div.input-container label{
   padding: 10px 0 5px;
+}
+div.modal-content div.input-container i {
+  position:absolute;
+  top:42px;
+  right:5px;
+  cursor: pointer;
 }
 div.modal-content label.list-item-title {
   font-size:1.5rem;
@@ -303,11 +310,51 @@ div.avatar img {
   padding:5px 0;
   text-align: center;
 }
-.navbar div.fa-eye {
-  /* padding:5px 0; */
+.navbar p.eye {
   display:flex;
-  justify-content: center;
+  justify-content: left;
+  padding:0 25px;
   color:var(--red-opaque8);
+}
+/* HOME */
+div.home {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items: top;
+  padding: 5px 10px;
+  overflow-y: auto;
+}
+div.home img {
+  object-fit: scale-down;
+  padding: 10px 0;
+  width: 95%;
+  max-height: 50%;
+}
+div.home p,
+div.home ul {
+  font-size: 1.7rem;
+  font-weight: 400;
+  margin: 5px;
+  padding: 0;
+}
+div.home li {
+  list-style: square;
+  list-style-position: inside;
+  padding-top: 5px;
+  padding-left: 15px;
+}
+
+@media (min-width: 1300px) {
+  div.home img {
+    width: 80%;
+  }
+}
+@media (min-width: 1800px) {
+  div.home img {
+    width: 60%;
+  }
 }
 /* PAGES */
 .page-container {
@@ -762,6 +809,48 @@ div.save-reminder {
 }
 .delete-button i.fa-trash:hover {
   opacity:.8;
+}
+/* LEGAL NOTICE */
+div.legal-notice {
+  overflow-y: auto;
+}
+div.legal-notice h2 {
+  margin-bottom:10px;
+}
+div.legal-notice li.h2 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+div.legal-notice ul {
+  padding-left:15px;
+}
+div.legal-notice ul li,
+div.legal-notice div.address {
+  font-size: 1.7rem;
+  font-weight: 400;
+}
+div.address p {
+  font-style: italic;
+  margin:5px 0;
+}
+div.address div.phone-email {
+  display: flex;
+  align-items: center;
+  padding-top:3px;
+}
+div.address i {
+  color: var(--black);
+  height: 2rem;
+  width: 2rem;
+  margin: 2px 5px 0 0;
+}
+div.legal-notice div.browser {
+  display:flex;
+  flex-wrap: wrap;
+  font-size: 1.5rem;
+}
+div.browser a {
+  margin:15px;
 }
 /* TOOLTIP */
 .toolbar-button.tooltip,.navbar.tooltip {

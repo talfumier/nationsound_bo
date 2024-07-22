@@ -1,0 +1,77 @@
+{
+  "design": {
+    "title": "Conception & réalisation",
+    "text": [
+      "ht consultant - 4, impasse du pigeonnier - 31330 LARRA",
+      "SIRET N° 980 922 264 00018"
+    ]
+  },
+  "host": {
+    "title": "Hébergement",
+    "text": []
+  },
+  "editor": {
+    "title": "Editeur",
+    "text": []
+  },
+  "property": {
+    "title": "Propriété intellectuelle",
+    "text": [
+      "L’ensemble de ce site relève des législations Française et Internationale sur les droits d’auteur et la propriété intellectuelle. Tous les droits de reproduction sont réservés pour les textes, images, photographies, sons, logiciels et éléments graphiques. La reproduction de tout ou partie de ce site quel qu’il soit, est formellement interdite sauf autorisation écrite de l’auteur ou créateur, conformément à l’article L 122-4 du Code de la Propriété intellectuelle."
+    ]
+  },
+  "credits": {
+    "title": "Crédits",
+    "text": [
+      "L’ensemble des éléments (logotypes, photographies, illustrations, sons, vidéos, textes…) du présent site Internet appartient au responsable de l’entreprise, ses partenaires ou fournisseurs."
+    ]
+  },
+  "responsibilities": {
+    "title": "Responsabilités",
+    "text": [
+      "Le créateur du présent site Internet ainsi que ses partenaires ou fournisseurs ne pourront être tenus responsables d’intrusion, piratage, infection ou conséquence d’utilisation du présent site Internet."
+    ]
+  },
+  "cnil": {
+    "title": "Informatique et libertés",
+    "text": [
+      "Certains services du site nécessitent pour l’internaute de renseigner des données personnelles par le biais de formulaires en ligne. Ces informations sont destinées exclusivement à la société éditrice du présent site Internet. L’internaute peut s’y opposer en contactant la société éditrice du site Internet. Les internautes disposent d’un droit d’accès, de rectification et de suppression des données les concernant."
+    ]
+  },
+  "data1": {
+    "title": "Collecte des données",
+    "text": [
+      "Notre site internet « Nation Sound Festival » collecte des données personnelles quand vous vous enregistez sur le site en tant qu'utilisateur.",
+      "Les données marquées par un astérisque doivent obligatoirement être fournies. Dans le cas contraire, nous serions dans l’incapacité d’apporter une réponse à votre demande.",
+      " Notre site est sécurisé en « https » afin d’assurer la protection des données échangées."
+    ]
+  },
+  "data2": {
+    "title": "Usage et durée de conservation des données",
+    "text": [
+      "Afin de préserver la confidentialité des données collectées, ces dernières seront uniquement destinées à un usage interne, dans le cadre de l'utilisation du site.",
+      "Ces données seront conservées tant que l'utilisateur aura un compte actif; il peut supprimer son compte et les données qui y sont rattachées à tout moment et de manière définitive."
+    ]
+  },
+  "data3": {
+    "title": "Comment supprimer mes données ?",
+    "text": [
+      "La suppression du compte entraine l'effacement définitif de toutes les données qui y sont rattachées (email, nom, prénom).",
+      "L'utilisateur peut à tout moment supprimer son compte à partir de son espace personnel (page profil)."
+    ]
+  },
+  "cookies1": {
+    "title": "Utilisation de cookies",
+    "text": [
+      "Ce site nécessite l’utilisation de cookies (marqueur témoin). Des informations non personnelles sont enregistrées par ce système, elles n’ont aucune signification en dehors de leur utilisation sur le présent site Internet. L’internaute peut refuser ces cookies ou les supprimer. Nous vous conseillons de consulter l’aide de votre navigateur pour connaître la marche à suivre.",
+      "Des mesures du nombre de visites, de pages vues ainsi que l’activité des visiteurs sur le site et leur fréquence de retour peuvent être effectuées sur le présent site Internet."
+    ]
+  },
+  "cookies2": {
+    "title": "Gestion des cookies",
+    "text": [
+      "Nous utilisons des cookies persistants afin d’améliorer l’expérience utilisateur. Ces cookies sont conservés sur votre ordinateur (pour une période maximale de 3 heures) même après fermeture de votre navigateur et réutilisés lors de vos prochaines visites sur notre site.",
+      "Vous avez la possibilité de désactiver les cookies en vous rendant dans les options de votre navigateur."
+    ]
+  }
+}

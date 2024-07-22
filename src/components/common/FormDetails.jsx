@@ -23,6 +23,7 @@ import {
   getContainerById,
   updateContainer,
 } from "../../services/httpFiles.jsx";
+import {requestNewPwd} from "../login/FormLogin.jsx";
 
 let updatedData = {},
   updatedFiles = [],
@@ -338,7 +339,12 @@ function FormDetails({entity, fields}) {
         })}
         {entity.noList.includes("users") && (
           <div className="input-container">
-            <button className="btn btn-info pwd-reset">
+            <button
+              className="btn btn-info pwd-reset"
+              onClick={() => {
+                requestNewPwd(fieldData.email);
+              }}
+            >
               Changer le mot de passe
             </button>
           </div>

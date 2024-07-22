@@ -22,6 +22,7 @@ function TextInput({
   format,
   equal,
   onHandleChange,
+  onHandleBlur,
 }) {
   const [data, setData] = useState("");
   const [dirty, setDirty] = useState(false);
@@ -38,6 +39,10 @@ function TextInput({
     const dta = fmt ? getFormattedDate(value, fmt) : value;
     setData(dta);
   }, [value]);
+  const [inputType, setInputType] = useState("text");
+  useEffect(() => {
+    if (format && format.includes("password")) setInputType("password");
+  }, []);
   function handleChange(e) {
     setDirty(true);
     setData(e.target.value);
@@ -52,7 +57,7 @@ function TextInput({
     );
     setFieldValid(valid);
   }
-  function validate(value) {
+  function validate(value, fmt) {
     if (!value || value.length === 0)
       return {
         valid: false,
@@ -63,9 +68,11 @@ function TextInput({
         ),
       };
     let result = {valid: true, msg: null};
-    switch (format) {
+    switch (fmt ? fmt : format) {
       case "text":
       case "password-not-null":
+        break;
+      case "password-match":
         if (equal && value !== equal)
           result = {
             valid: false,
@@ -127,24 +134,37 @@ function TextInput({
     <div className="input-container">
       <label>{`${label}${required ? " *" : ""}`}</label>
       {type === "input" && (
-        <input
-          type={
-            format !== undefined
-              ? format.includes("password")
-                ? "password"
-                : format
-              : "text"
-          }
-          className={`text ${disabled ? "disabled" : ""} ${
-            fieldValid.valid ? "valid" : "not-valid"
-          }`}
-          placeholder={placeholder}
-          value={data}
-          disabled={disabled}
-          onChange={handleChange}
-          name={name}
-          autoComplete="on"
-        />
+        <>
+          <input
+            type={inputType}
+            className={`text ${disabled ? "disabled" : ""} ${
+              fieldValid.valid ? "valid" : "not-valid"
+            }`}
+            placeholder={placeholder}
+            value={data}
+            disabled={disabled}
+            onChange={handleChange}
+            name={name}
+            autoComplete="on"
+            onBlur={(e) => {
+              if (name === "password" || name === "password-match") {
+                const valid = validate(e.target.value, name);
+                setFieldValid(valid);
+                onHandleBlur(valid.valid);
+              }
+            }}
+          />
+          {name.includes("password") && (
+            <i
+              className={`fa-regular fa-eye${
+                inputType !== "password" ? "-slash" : ""
+              }`}
+              onClick={() => {
+                setInputType(inputType === "text" ? "password" : "text");
+              }}
+            ></i>
+          )}
+        </>
       )}
       {type === "textarea" && (
         <textarea

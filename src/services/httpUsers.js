@@ -13,6 +13,14 @@ export function register(email, role, pwd) {
     pwd,
   });
 }
+export function forgotPassword(url, email) {
+  return http.post(`${api}/resetpassword/forgotPassword`, {url, email});
+}
+export function resetPassword(id, resetToken, pwd) {
+  return http.patch(`${api}/resetpassword/forgotPassword/${id}/${resetToken}`, {
+    pwd,
+  });
+}
 export function decodeJWT(jwt) {
   try {
     return jwtDecode(jwt);

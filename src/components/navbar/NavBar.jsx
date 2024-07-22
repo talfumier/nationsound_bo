@@ -108,7 +108,7 @@ function NavBar() {
           variant="info"
           content="Site NationSound en ligne."
         />
-        <div className="fa-solid fa-eye fa-2x eye-anchor "></div>
+        <p className="fa-regular fa-eye fa-2x eye eye-anchor"></p>
       </NavLink>
       <hr></hr>
       <NavLink to="/legal-notice">

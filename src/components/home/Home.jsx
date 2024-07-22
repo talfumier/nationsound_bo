@@ -1,9 +1,8 @@
 import archi from "../../assets/images/architecture.png";
-import classes from "./home.module.css";
 
-function Home(props) {
+function Home() {
   return (
-    <div className={`${classes.home}`}>
+    <div className="home">
       <h2>Présentation de l'application</h2>
       <p>
         Cette application ("back-office") est dédiée aux organisateurs du
