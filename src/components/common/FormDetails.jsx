@@ -22,6 +22,7 @@ import {
   deleteContainer,
   getContainerById,
   updateContainer,
+  postInCloud,
 } from "../../services/httpFiles.jsx";
 import {requestNewPwd} from "../login/FormLogin.jsx";
 
@@ -34,7 +35,7 @@ function FormDetails({entity, fields}) {
   if (!entity.fileYes) entity.fileYes = "";
   if (!entity.noList) entity.noList = "";
 
-  const {id} = useParams(); //route parameter
+  let {id} = useParams(); //route parameter
   const location = useLocation();
   const abortController = new AbortController();
   const signal = abortController.signal;
@@ -62,7 +63,7 @@ function FormDetails({entity, fields}) {
         obj[field.name] = "";
       });
       obj.files_id = null;
-      return obj;
+      setFieldData(obj);
     }
     async function loadData(signal) {
       try {
@@ -75,9 +76,7 @@ function FormDetails({entity, fields}) {
         setFieldData(res.data);
       } catch (error) {}
     }
-    if (!entity.noList)
-      setFieldData(id != -1 ? location.state.data : initEmpty());
-    else loadData(signal);
+    id != -1 ? loadData(signal) : initEmpty();
   }, [reset]);
   /* FILES DATA */
   const contextImages = useContext(ImagesContext);
@@ -99,7 +98,8 @@ function FormDetails({entity, fields}) {
         }
       } catch (error) {}
     }
-    if (entity.fileYes) loadContainer(fieldData.files_id, signal);
+    if (entity.fileYes && fieldData.files_id)
+      loadContainer(fieldData.files_id, signal);
   }, [reset, contextImages.containers, fieldData.files_id]);
   /* CLEAN UP */
   useEffect(() => {
@@ -156,7 +156,7 @@ function FormDetails({entity, fields}) {
     setStatus({save: false, undo: false});
     resetChangeMonitor();
   }
-  function handleMain(val, idx) {
+  async function handleMain(main, val, idx) {
     let bl = false;
     files.files.map((item, i) => {
       if (!bl && i === idx && item.size === 0) bl = true; //new file not yet saved
@@ -169,8 +169,8 @@ function FormDetails({entity, fields}) {
     }
     const fls = _.cloneDeep(files);
     fls.files.map((item, i) => {
-      if (!val && i === idx) return (item.main = false);
-      if (val) return (item.main = i === idx ? true : false);
+      if (!main && i === idx) return (item.main = false);
+      if (main) return (item.main = i === idx ? true : false);
     });
     fls.files.map((item, i) => {
       handleChange("files", null, true, item, i);
@@ -187,8 +187,8 @@ function FormDetails({entity, fields}) {
     fls.files.map((item) => {
       if (!bl && item.name.length > 0) bl = true;
     });
-    if (!bl && fieldData.files_id) {
-      try {
+    new Promise(async (resolve0, reject) => {
+      if (!bl && fieldData.files_id) {
         await deleteContainer(fieldData.files_id, cookies.user, signal); //delete file container in API (mongoDB)
         contextImages.onHandleImages(fieldData.files_id, "remove");
         await patchEntity(
@@ -199,77 +199,159 @@ function FormDetails({entity, fields}) {
           signal
         ); //update field data in API (MySQL)
         updatedData.files_id = null;
-      } catch (error) {
+        resolve0(true);
+      } else resolve0(true);
+    })
+      .then(() => {
+        new Promise((resolve1, reject) => {
+          let body = null,
+            main = null,
+            i = null;
+          if (bl && updatedFiles.length > 0) {
+            try {
+              body = _.filter(fls.files, (item) => {
+                return item.name.length > 0;
+              });
+              main = _.filter(body, (item, idx) => {
+                if (item.main) i = idx;
+                return item.main;
+              })[0];
+              new Promise(async (resolve, reject) => {
+                let result = null;
+                if (
+                  main &&
+                  main.data &&
+                  updatedFiles[0][0] === i &&
+                  updatedFiles[0][1].main
+                ) {
+                  result = await postInCloud(
+                    main.name.replaceAll(" ", ""),
+                    encodeURI(main.data),
+                    cookies.user,
+                    signal
+                  );
+                  resolve(result);
+                } else resolve(-1);
+              })
+                .then(async (result) => {
+                  if (result !== -1) {
+                    body[i]["url"] = result.data.url;
+                    body[i]["data"] = null;
+                    fls.files[i] = {
+                      ...fls.files[i],
+                      data: null,
+                      url: result.data.url,
+                    };
+                  }
+                  if (fieldData.files_id) {
+                    //existing file container
+                    try {
+                      await updateContainer(
+                        fieldData.files_id,
+                        {files: body},
+                        cookies.user,
+                        signal
+                      );
+                      if (entity.fileYes.includes("image"))
+                        contextImages.onHandleImages(
+                          fieldData.files_id,
+                          {files: body},
+                          "update"
+                        );
+                    } catch (error) {}
+                    resolve1(true);
+                  } else {
+                    //no existing file container
+                    new Promise(async (resolve, reject) => {
+                      const {data: res} = await postContainer(
+                        {files: body},
+                        cookies.user,
+                        signal
+                      );
+                      if (res.data._id) resolve(res.data._id);
+                    })
+                      .then((_id) => {
+                        if (entity.fileYes.includes("image"))
+                          contextImages.onHandleImages(
+                            null,
+                            {_id, files: body},
+                            "add"
+                          );
+                        updatedData.files_id = _id;
+                        resolve1(true);
+                      })
+                      .catch((error) => {
+                        //catching errors handled by axios interceptors in httpService.js
+                      });
+                  }
+                })
+                .catch((error) => {
+                  //catching errors handled by axios interceptors in httpService.js
+                });
+            } catch (error) {
+              //catching errors handled by axios interceptors in httpService.js
+            }
+          } else resolve1(true);
+        })
+          .then(async () => {
+            new Promise(async (resolve2, reject) => {
+              /* FIELD DATA PROCESSING */
+              if (Object.keys(updatedData).length > 0) {
+                try {
+                  if (id == -1) {
+                    if (entity.fileYes && !updatedData.files_id)
+                      updatedData.files_id = null;
+                    const {data: res} = await postEntity(
+                      entity.name,
+                      updatedData,
+                      cookies.user,
+                      signal
+                    );
+                    updatedData.id = res.data.id;
+                    contextSelection.onHandleSelected(
+                      entity.name,
+                      updatedData.id,
+                      true
+                    );
+                    resolve2(true);
+                  } else {
+                    await patchEntity(
+                      entity.name,
+                      id,
+                      updatedData,
+                      cookies.user,
+                      signal
+                    );
+                    resolve2(true);
+                  }
+                } catch (error) {
+                  //catching errors handled by axios interceptors in httpService.js
+                }
+              } else resolve2(true);
+            })
+              .then(() => {
+                setFieldData({...fieldData, ...updatedData}); //update fieldData local state
+                if (entity.fileYes) setFiles(fls); //update files local state
+                setStatus({save: false, undo: false});
+                toastSuccess(
+                  `${entity.label} ${
+                    id == -1 ? "créé" : "mis à jour"
+                  } avec succès !`
+                );
+                resetChangeMonitor();
+                if (id == -1) id += 1;
+              })
+              .catch((error) => {
+                //catching errors handled by axios interceptors in httpService.js
+              });
+          })
+          .catch((error) => {
+            //catching errors handled by axios interceptors in httpService.js
+          });
+      })
+      .catch((error) => {
         //catching errors handled by axios interceptors in httpService.js
-      }
-    }
-    let body = null;
-    if (bl && updatedFiles.length > 0) {
-      try {
-        body = _.filter(fls.files, (item) => {
-          return item.name.length > 0;
-        });
-        if (fieldData.files_id) {
-          //existing file container
-          await updateContainer(
-            fieldData.files_id,
-            {files: body},
-            cookies.user,
-            signal
-          );
-          if (entity.fileYes.includes("image"))
-            contextImages.onHandleImages(
-              fieldData.files_id,
-              {files: body},
-              "update"
-            );
-        } else {
-          //no existing file container
-          const {data: res} = await postContainer(
-            {files: body},
-            cookies.user,
-            signal
-          );
-          if (entity.fileYes.includes("image"))
-            contextImages.onHandleImages(
-              null,
-              {_id: res.data._id, files: body},
-              "add"
-            );
-          updatedData.files_id = res.data._id;
-        }
-      } catch (error) {
-        //catching errors handled by axios interceptors in httpService.js
-      }
-    }
-    /* FIELD DATA PROCESSING */
-    if (Object.keys(updatedData).length > 0) {
-      try {
-        if (id == -1) {
-          if (entity.fileYes && !updatedData.files_id)
-            updatedData.files_id = null;
-          const {data: res} = await postEntity(
-            entity.name,
-            updatedData,
-            cookies.user,
-            signal
-          );
-          updatedData.id = res.data.id;
-          contextSelection.onHandleSelected(entity.name, updatedData.id, true);
-        } else
-          await patchEntity(entity.name, id, updatedData, cookies.user, signal);
-        setFieldData({...fieldData, ...updatedData}); //update fieldData local state
-      } catch (error) {
-        //catching errors handled by axios interceptors in httpService.js
-      }
-    }
-
-    if (entity.fileYes) setFiles(fls); //update files local state
-    setStatus({save: false, undo: false});
-    toastSuccess(
-      `${entity.label} ${id == -1 ? "créé" : "mis à jour"} avec succès !`
-    );
-    resetChangeMonitor();
+      });
   }
   function resetChangeMonitor() {
     updatedData = {};
@@ -372,8 +454,8 @@ function FormDetails({entity, fields}) {
                   onHandleChange={(val) => {
                     handleChange("files", null, true, val, idx);
                   }}
-                  onHandleMain={(val) => {
-                    handleMain(val, idx);
+                  onHandleMain={(main, val) => {
+                    handleMain(main, val, idx);
                   }}
                 ></FileUnit>
               );

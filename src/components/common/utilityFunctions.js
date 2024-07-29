@@ -93,7 +93,8 @@ export function getEmptyFile() {
     type: "",
     size: 0,
     lastModified: 0,
-    data: "",
+    url: null,
+    data: null,
   };
 }
 export function fillUpContainer(cont) {
@@ -104,4 +105,13 @@ export function fillUpContainer(cont) {
     n += 1;
   } while (n < 3);
   return cont;
+}
+export async function loadImageFromUrl(url) {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+  } catch (error) {
+    return null;
+  }
 }

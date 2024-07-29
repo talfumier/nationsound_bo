@@ -1,5 +1,6 @@
 import http from "./httpService.js";
 import {getApiUrl} from "./utilsFunctions.js";
+import config from "../config.json";
 
 const api = getApiUrl();
 
@@ -14,6 +15,16 @@ export function postContainer(data, token, signal) {
     headers: {"x-auth-token": token},
     signal,
   });
+}
+export function postInCloud(publicId, data, token, signal) {
+  return http.post(
+    `${api}/files/cloudinary-upload-base64`,
+    {publicId, data},
+    {
+      headers: {"x-auth-token": token},
+      signal,
+    }
+  );
 }
 export function updateContainer(id, data, token, signal) {
   return http.put(`${api}/files/${id}`, data, {

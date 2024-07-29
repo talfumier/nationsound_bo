@@ -72,7 +72,7 @@
     },
     "fields": [
       {
-        "name": "name",
+        "name": "title",
         "label": "Désignation",
         "rows": 2,
         "type": "textarea",

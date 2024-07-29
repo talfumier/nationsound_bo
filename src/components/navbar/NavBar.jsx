@@ -1,20 +1,17 @@
-import {useEffect, useState, useContext} from "react";
+import {useEffect, useState} from "react";
 import {NavLink} from "react-router-dom";
 import {useCookies} from "react-cookie";
 import _ from "lodash";
 import {getContainerById} from "../../services/httpFiles.jsx";
+import {loadImageFromUrl} from "../common/utilityFunctions.js";
 import {Tooltip} from "react-tooltip";
 import {decodeJWT} from "../../services/httpUsers.js";
-import ImagesContext from "../../services/context/ImagesContext.js";
 
 function NavBar() {
   const [cookies, setCookie, removeCookie] = useCookies(["user"]);
   const currentUser = cookies.user ? decodeJWT(cookies.user) : null;
 
-  const contextImages = useContext(ImagesContext);
-
   const abortController = new AbortController();
-  const signal = abortController.signal;
   const [avatar, setAvatar] = useState([]);
 
   const items = [
@@ -36,14 +33,13 @@ function NavBar() {
       if (currentUser.files_id) {
         const {data: res} = await getContainerById(
           currentUser.files_id,
-          signal
+          abortController.signal
         );
-        contextImages.onHandleImages(null, res.data, "add");
         file = _.filter(res.data.files, (img) => {
           return img.main === true;
         })[0];
       }
-      if (file) setAvatar(["file", file.data]);
+      if (file) setAvatar(["file", await loadImageFromUrl(file.url)]);
       else {
         const str = Array.from(
           (currentUser.first_Name
@@ -57,6 +53,9 @@ function NavBar() {
       }
     }
     loadAvatar();
+    return () => {
+      abortController.abort(); //clean-up code after component has unmounted
+    };
   }, []);
   return (
     <nav className="navbar">

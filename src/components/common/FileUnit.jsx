@@ -2,7 +2,12 @@ import {useState, useEffect} from "react";
 import {arrayBufferToWebP} from "webp-converter-browser";
 import {toDate} from "date-fns";
 import TextBox from "./TextBox.jsx";
-import {fileSize, getEmptyFile, getFormattedDate} from "./utilityFunctions.js";
+import {
+  fileSize,
+  getEmptyFile,
+  getFormattedDate,
+  loadImageFromUrl,
+} from "./utilityFunctions.js";
 import config from "../../config.json";
 import {toastError} from "./toastSwal/ToastMessages.js";
 
@@ -15,7 +20,11 @@ function FileUnit({fileYes, idx, dataIn, onHandleChange, onHandleMain}) {
   ];
   const [value, setValue] = useState(null);
   useEffect(() => {
-    setValue(dataIn);
+    async function loadImage() {
+      setValue({...dataIn, data: await loadImageFromUrl(dataIn.url)});
+    }
+    if (dataIn.url) loadImage();
+    else setValue(dataIn);
   }, [dataIn]);
 
   function handleClear() {
@@ -54,6 +63,7 @@ function FileUnit({fileYes, idx, dataIn, onHandleChange, onHandleMain}) {
               type: blob.type,
               size: blob.size,
               lastModified: file.lastModified,
+              url: null,
               data: reader2.result,
             };
             processData(val);
@@ -77,6 +87,7 @@ function FileUnit({fileYes, idx, dataIn, onHandleChange, onHandleMain}) {
             type: file.type ? file.type : "umap",
             size: file.size,
             lastModified: file.lastModified,
+            url: null,
             data: reader1.result,
           };
           processData(val);
@@ -146,7 +157,7 @@ function FileUnit({fileYes, idx, dataIn, onHandleChange, onHandleMain}) {
           <button
             className="publish"
             onClick={() => {
-              onHandleMain(!value.main);
+              onHandleMain(!value.main, value);
             }}
           >{`${value.main ? "ACTIF" : "ACTIVER"}`}</button>
           {fileYes.includes("image") && (
