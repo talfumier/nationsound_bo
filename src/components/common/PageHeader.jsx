@@ -1,7 +1,8 @@
 import {NavLink, useLocation} from "react-router-dom";
 import BackButton from "./BackButton.jsx";
+import PageLoader from "./PageLoader.jsx";
 
-function PageHeader({title, len, url, data}) {
+function PageHeader({title, len, url, data, isLoading}) {
   const location = useLocation();
 
   const cond = () => {
@@ -18,6 +19,7 @@ function PageHeader({title, len, url, data}) {
   };
   return (
     <div className="page-header">
+      {isLoading && <PageLoader></PageLoader>}
       <BackButton></BackButton>
       <h2>
         {title}

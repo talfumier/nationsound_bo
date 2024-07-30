@@ -79,7 +79,7 @@ function FileUnit({fileYes, idx, dataIn, onHandleChange, onHandleMain}) {
         reader1.readAsArrayBuffer(file);
       }
       if (fileYes.includes("umap")) {
-        reader1.readAsDataURL(file);
+        reader1.readAsText(file);
         reader1.onload = function () {
           val = {
             ...val,
@@ -88,7 +88,7 @@ function FileUnit({fileYes, idx, dataIn, onHandleChange, onHandleMain}) {
             size: file.size,
             lastModified: file.lastModified,
             url: null,
-            data: reader1.result,
+            data: btoa(reader1.result),
           };
           processData(val);
         };

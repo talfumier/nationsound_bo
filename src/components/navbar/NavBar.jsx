@@ -26,6 +26,7 @@ function NavBar() {
     ["/faqs", "FAQ"],
     ["/maps", "Carte"],
     ["/logos", "Logo"],
+    ["/newsletters", "Newsletter"],
   ];
   useEffect(() => {
     async function loadAvatar() {

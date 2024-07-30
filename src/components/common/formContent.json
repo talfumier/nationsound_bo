@@ -310,7 +310,6 @@
       }
     ]
   },
-
   "logo": {
     "entity": {
       "name": "logo",
@@ -323,6 +322,22 @@
       {
         "name": "name",
         "label": "Logo",
+        "type": "textarea",
+        "listMaster": true
+      }
+    ]
+  },
+  "newsletter": {
+    "entity": {
+      "name": "newsletter",
+      "label": "Newsletters",
+      "labels": "Newsletters",
+      "orderBy": {"field": "email", "order": "asc"}
+    },
+    "fields": [
+      {
+        "name": "email",
+        "label": "Courriel",
         "type": "textarea",
         "listMaster": true
       }

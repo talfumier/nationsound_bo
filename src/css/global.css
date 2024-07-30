@@ -557,18 +557,25 @@ div.product-details {
   padding-right: 15px;
   overflow-y: auto;
 }
+
 @media (min-width:768px) {
-  div.product-details {
+  div.product-details:not(.newsletter){
     gap:0 15px;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(6, auto);
+  }
+  div.product-details.newsletter {
+    grid-template-columns:min(400px)
+  }
+  div.product-details.newsletter div.input-container {
+    width:100%;
   }
 }
 @media (min-width:992px) {
   div.product-details.faq {
     width: 80vw;
   }
-  div.product-details:not(.faq) {
+  div.product-details:not(.faq,.newsletter) {
     gap: 0 20px;
     grid-template-columns: 1fr 1fr 1fr;
     padding-bottom: 30px;
@@ -656,6 +663,11 @@ div.page-not-found h2 {
   text-align: center;
   line-height: 5rem;
   white-space: wrap;
+}
+div.page-header .page-loader {
+  position: absolute;
+  top:10px;
+  left:50%;
 }
 /* FORM CONTROLS */
 ::placeholder {

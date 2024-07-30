@@ -34,6 +34,7 @@ function FormDetails({entity, fields}) {
   // entity > {name:"artist",label:"Artiste",labels:"Artistes",fileYes, noList}
   if (!entity.fileYes) entity.fileYes = "";
   if (!entity.noList) entity.noList = "";
+  const [isLoading, setIsloading] = useState(false);
 
   let {id} = useParams(); //route parameter
   const location = useLocation();
@@ -178,6 +179,7 @@ function FormDetails({entity, fields}) {
     setFiles(fls);
   }
   async function handleSave() {
+    setIsloading(true);
     /* FILES DATA PROCESSING */
     const fls = _.cloneDeep(files);
     updatedFiles.map((item) => {
@@ -234,7 +236,7 @@ function FormDetails({entity, fields}) {
                 } else resolve(-1);
               })
                 .then(async (result) => {
-                  if (result !== -1) {
+                  if (result !== -1 && entity.fileYes.includes("image")) {
                     body[i]["url"] = result.data.url;
                     body[i]["data"] = null;
                     fls.files[i] = {
@@ -340,6 +342,7 @@ function FormDetails({entity, fields}) {
                 );
                 resetChangeMonitor();
                 if (id == -1) id += 1;
+                setIsloading(false);
               })
               .catch((error) => {
                 //catching errors handled by axios interceptors in httpService.js
@@ -373,6 +376,7 @@ function FormDetails({entity, fields}) {
           <PageHeader
             title={`${entity.labels}`}
             len={location.state.len}
+            isLoading={isLoading}
           ></PageHeader>
           <hr />
         </>
