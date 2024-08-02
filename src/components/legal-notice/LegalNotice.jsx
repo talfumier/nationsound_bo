@@ -57,9 +57,9 @@ function LegalNotice() {
           );
         })}
         <div className="browser">
-          {browsers.map((item) => {
+          {browsers.map((item, idx) => {
             return (
-              <a href={item.link} target="_blank">
+              <a key={idx} href={item.link} target="_blank">
                 {item.browser}
               </a>
             );

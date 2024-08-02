@@ -37,7 +37,7 @@ function FormDetails({entity, fields}) {
 
   const [isLoading, setIsloading] = useState(false);
   useEffect(() => {
-    if (isLoading && document.getElementsByClassName("page-loader"))
+    if (isLoading && document.getElementsByClassName("page-loader").length > 0)
       document.getElementsByClassName("page-loader")[0].style.display = "block";
   }, [isLoading]);
 
