@@ -34,7 +34,12 @@ function FormDetails({entity, fields}) {
   // entity > {name:"artist",label:"Artiste",labels:"Artistes",fileYes, noList}
   if (!entity.fileYes) entity.fileYes = "";
   if (!entity.noList) entity.noList = "";
+
   const [isLoading, setIsloading] = useState(false);
+  useEffect(() => {
+    if (isLoading && document.getElementsByClassName("page-loader"))
+      document.getElementsByClassName("page-loader")[0].style.display = "block";
+  }, [isLoading]);
 
   let {id} = useParams(); //route parameter
   const location = useLocation();
@@ -86,6 +91,7 @@ function FormDetails({entity, fields}) {
     // files data initialization
     async function loadContainer(_id, signal) {
       try {
+        setIsloading(true);
         if (id != -1 && _id) {
           const cont = _.filter(contextImages.containers, (item) => {
             return item._id === fieldData.files_id;
@@ -97,6 +103,7 @@ function FormDetails({entity, fields}) {
             setFiles(fillUpContainer(res.data));
           }
         }
+        setIsloading(false);
       } catch (error) {}
     }
     if (entity.fileYes && fieldData.files_id)
