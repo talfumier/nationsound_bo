@@ -1,6 +1,5 @@
 import http from "./httpService.js";
 import {getApiUrl} from "./utilsFunctions.js";
-import config from "../config.json";
 
 const api = getApiUrl();
 

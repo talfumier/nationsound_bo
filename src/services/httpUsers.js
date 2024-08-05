@@ -1,4 +1,4 @@
-import http from "./httpService";
+import http from "./httpService.js";
 import {jwtDecode} from "jwt-decode";
 import {getApiUrl} from "./utilsFunctions.js";
 

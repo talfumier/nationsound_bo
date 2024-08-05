@@ -23,9 +23,11 @@
     "web-vitals": "^2.1.4",
     "webp-converter-browser": "^1.0.4"
   },
+  "type": "module",
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "npm run config && react-scripts build",
+    "config": "node src/environment/generate-env.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
