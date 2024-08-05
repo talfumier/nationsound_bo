@@ -23,6 +23,7 @@
     "web-vitals": "^2.1.4",
     "webp-converter-browser": "^1.0.4"
   },
+  "type": "module",
   "scripts": {
     "start": "react-scripts start",
     "build": "npm run config && react-scripts build",

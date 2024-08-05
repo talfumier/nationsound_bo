@@ -12,7 +12,7 @@ import formContent from "./components/common/formContent.json";
 import NotFound from "./components/notFound/NotFound.jsx";
 
 import SelectionContext from "./services/context/SelectionContext.js";
-import ImagesContext from "./services/context/ImagesContext";
+import ImagesContext from "./services/context/ImagesContext.js";
 
 import "./css/global.css";
 import "./css/normalize.css";
