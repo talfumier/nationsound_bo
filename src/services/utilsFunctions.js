@@ -1,9 +1,6 @@
-import config from "../config.json";
+import {environment} from "../environment/environment.js";
 export function getApiUrl() {
-  switch (process.env.REACT_APP_NODE_ENV) {
-    case "development":
-      return config.api_url_dev;
-    case "production":
-      return config.api_url_prod;
-  }
+  return environment.production
+    ? environment.api_url_prod
+    : environment.api_url_dev;
 }

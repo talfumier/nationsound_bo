@@ -348,12 +348,8 @@ div.home li {
 
 @media (min-width: 1300px) {
   div.home img {
+    max-height:60%;
     width: 80%;
-  }
-}
-@media (min-width: 1800px) {
-  div.home img {
-    width: 60%;
   }
 }
 /* PAGES */

@@ -8,7 +8,7 @@ import {
   getFormattedDate,
   loadImageFromUrl,
 } from "./utilityFunctions.js";
-import config from "../../config.json";
+import {environment} from "../../environment/environment.js";
 import {toastError} from "./toastSwal/ToastMessages.js";
 
 function FileUnit({fileYes, idx, dataIn, onHandleChange, onHandleMain}) {
@@ -44,7 +44,7 @@ function FileUnit({fileYes, idx, dataIn, onHandleChange, onHandleMain}) {
         reader1.onload = async function () {
           let name = file.name;
           const blob = await arrayBufferToWebP(reader1.result);
-          if (blob.size > config.max_file_size) {
+          if (blob.size > environment.max_file_size) {
             toastError(
               "La taille du fichier est supérieure à la valeur max autorisée !"
             );

@@ -25,7 +25,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "npm run config && react-scripts build",
+    "config": "node src/environment/generate-env.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
