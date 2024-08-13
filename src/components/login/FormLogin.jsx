@@ -15,7 +15,7 @@ import {isValidPwd} from "../common/utilityFunctions.js";
 
 export async function requestNewPwd(email) {
   try {
-    const {data: res} = await forgotPassword(window.location.origin, email);
+    const {data: res} = await forgotPassword(email);
     const text = await translate({
       text: res.message,
       to: "fr",
@@ -24,7 +24,7 @@ export async function requestNewPwd(email) {
   } catch (error) {}
 }
 
-function FormLogin() {
+function FormLogin({onHandleExpiration}) {
   const fields = [
     {
       name: "user_id",
@@ -85,11 +85,11 @@ function FormLogin() {
           case false: //login case
             res = await login(data.data.user_id, data.data.password);
             const {exp} = decodeJWT(res.headers["x-auth-token"]); //exp is expressed in seconds since EPOCH
-
             setCookie("user", res.headers["x-auth-token"], {
               path: "/",
               expires: new Date(exp * 1000),
             });
+            onHandleExpiration(exp);
         }
       }
     } catch (error) {}

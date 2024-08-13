@@ -1,4 +1,6 @@
 import {useState, useEffect} from "react";
+import {useCookies} from "react-cookie";
+import {useNavigate} from "react-router-dom";
 import _ from "lodash";
 import {translate} from "../../services/httpGoogleServices.js";
 import TextInput from "../common/TextInput.jsx";
@@ -6,6 +8,8 @@ import {resetPassword} from "../../services/httpUsers.js";
 import {toastSuccess} from "../common/toastSwal/ToastMessages.js";
 
 function FormRecover({id, token}) {
+  const [cookies, setCookie, removeCookie] = useCookies();
+  const navigate = useNavigate();
   const fields = [
     {
       name: "password",
@@ -43,6 +47,11 @@ function FormRecover({id, token}) {
         to: "fr",
       });
       toastSuccess(text);
+      removeCookie("user");
+      navigate("/");
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } catch (error) {}
   }
   return (
