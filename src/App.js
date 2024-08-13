@@ -2,6 +2,7 @@ import {useState, Fragment, useEffect} from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import {useCookies} from "react-cookie";
 import _ from "lodash";
+import {differenceInMilliseconds, format} from "date-fns";
 import {decodeJWT} from "./services/httpUsers.js";
 import Header from "./components/header/Header.jsx";
 import NavBar from "./components/navbar/NavBar.jsx";
@@ -18,9 +19,11 @@ import "./css/global.css";
 import "./css/normalize.css";
 import "react-toastify/dist/ReactToastify.css";
 import ContainerToast from "./components/common/toastSwal/ContainerToast.jsx";
+import {SwalOk} from "./components/common/toastSwal/SwalOkCancel.jsx";
 import FormLogin from "./components/login/FormLogin.jsx";
 import FormRecover from "./components/login/FormRecover.jsx";
 import LegalNotice from "./components/legal-notice/LegalNotice.jsx";
+import {toastWarning} from "./components/common/toastSwal/ToastMessages.js";
 
 function App() {
   const location = window.location;
@@ -70,12 +73,31 @@ function App() {
       return item.listMaster;
     });
   }
+  function handleExpiration(exp) {
+    //exp is in seconds since EPOCH
+    const limit = differenceInMilliseconds(new Date(exp * 1000), new Date());
+    setTimeout(async () => {
+      await SwalOk(
+        `Votre jeton d'authentification arrive à expiration dans 5 mns à ${format(
+          new Date(exp * 1000),
+          "HH:mm"
+        ).replace(":", "h")} !`,
+        "Il faudra vous identifier à nouveau, pensez à sauvegarder votre travail en cours si besoin."
+      );
+    }, limit - 3e5); //warning 5 mns before token expiration
+    setTimeout(() => {
+      toastWarning("Vous avez été déconnecté du service !");
+      removeCookie("user");
+    }, limit);
+  }
   return (
     <BrowserRouter>
       <Header></Header>
       <div className="app-wrapper">
         <div className="app-main-content">
-          {!cookies.user && !resetPwd.value && <FormLogin></FormLogin>}
+          {!cookies.user && !resetPwd.value && (
+            <FormLogin onHandleExpiration={handleExpiration}></FormLogin>
+          )}
           {!cookies.user && resetPwd.value && (
             <FormRecover id={resetPwd.id} token={resetPwd.random}></FormRecover> //forgot password case
           )}
