@@ -78,11 +78,11 @@ function App() {
     const limit = differenceInMilliseconds(new Date(exp * 1000), new Date());
     setTimeout(async () => {
       await SwalOk(
-        `Votre jeton d'authentification arrive à expiration dans 5 mns à ${format(
+        `Expiration du jeton d'authentification à ${format(
           new Date(exp * 1000),
           "HH:mm"
         ).replace(":", "h")} !`,
-        "Il faudra vous identifier à nouveau, pensez à sauvegarder votre travail en cours si besoin."
+        "Il faudra vous identifier à nouveau, pensez à sauvegarder votre travail en cours."
       );
     }, limit - 3e5); //warning 5 mns before token expiration
     setTimeout(() => {
