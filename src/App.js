@@ -39,6 +39,7 @@ function App() {
   useEffect(() => {
     if (!currentUser) return;
     if (currentUser.role !== "admin") delete formContent.account;
+    handleExpiration(currentUser.exp);
   }, [currentUser]);
 
   const [selected, setSelected] = useState({});
@@ -95,9 +96,7 @@ function App() {
       <Header></Header>
       <div className="app-wrapper">
         <div className="app-main-content">
-          {!cookies.user && !resetPwd.value && (
-            <FormLogin onHandleExpiration={handleExpiration}></FormLogin>
-          )}
+          {!cookies.user && !resetPwd.value && <FormLogin></FormLogin>}
           {!cookies.user && resetPwd.value && (
             <FormRecover id={resetPwd.id} token={resetPwd.random}></FormRecover> //forgot password case
           )}

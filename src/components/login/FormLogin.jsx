@@ -24,7 +24,7 @@ export async function requestNewPwd(email) {
   } catch (error) {}
 }
 
-function FormLogin({onHandleExpiration}) {
+function FormLogin({}) {
   const fields = [
     {
       name: "user_id",
@@ -89,7 +89,6 @@ function FormLogin({onHandleExpiration}) {
               path: "/",
               expires: new Date(exp * 1000),
             });
-            onHandleExpiration(exp);
         }
       }
     } catch (error) {}
