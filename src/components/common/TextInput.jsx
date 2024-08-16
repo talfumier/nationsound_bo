@@ -23,6 +23,7 @@ function TextInput({
   equal,
   onHandleChange,
   onHandleBlur,
+  onHandleEnter,
 }) {
   const [data, setData] = useState("");
   const [dirty, setDirty] = useState(false);
@@ -152,6 +153,9 @@ function TextInput({
                 setFieldValid(valid);
                 onHandleBlur(valid.valid);
               }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") onHandleEnter();
             }}
           />
           {name.includes("password") && (

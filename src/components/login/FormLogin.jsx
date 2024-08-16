@@ -93,6 +93,10 @@ function FormLogin({}) {
       }
     } catch (error) {}
   }
+  function handleEnter() {
+    if (disabled) return;
+    handleSubmit();
+  }
   return (
     <div className="modal">
       <div className="modal-content">
@@ -117,6 +121,7 @@ function FormLogin({}) {
                   setFormValid({...formValid, [name]: valid});
                 }}
                 onHandleBlur={() => {}} //does nothing but avoiding bug
+                onHandleEnter={handleEnter}
               ></TextInput>
             )
           );
