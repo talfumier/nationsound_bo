@@ -77,6 +77,8 @@ function App() {
   function handleExpiration(exp) {
     //exp is in seconds since EPOCH
     const limit = differenceInMilliseconds(new Date(exp * 1000), new Date());
+    let warning = 0;
+    if (limit - 3e5 > 0) warning = limit - 3e5; //warning 5 mns before token expiration
     setTimeout(async () => {
       await SwalOk(
         `Expiration du jeton d'authentification à ${format(
@@ -85,7 +87,7 @@ function App() {
         ).replace(":", "h")} !`,
         "Il faudra vous identifier à nouveau, pensez à sauvegarder votre travail en cours."
       );
-    }, limit - 3e5); //warning 5 mns before token expiration
+    }, warning);
     setTimeout(() => {
       toastWarning("Vous avez été déconnecté du service !");
       removeCookie("user");
