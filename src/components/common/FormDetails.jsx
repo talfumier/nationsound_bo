@@ -83,7 +83,7 @@ function FormDetails({entity, fields}) {
       } catch (error) {}
     }
     id != -1 ? loadData(signal) : initEmpty();
-  }, [reset]);
+  }, [entity, reset]);
   /* FILES DATA */
   const contextImages = useContext(ImagesContext);
   const [files, setFiles] = useState(fillUpContainer({_id: null, files: []}));
@@ -127,8 +127,8 @@ function FormDetails({entity, fields}) {
           original = new Date(original).setHours(0, 0, 0, 0);
           break;
         case "date-time":
-          modified = modified ? modified.getTime() : null;
-          original = new Date(original).getTime();
+          modified = modified ? modified.setSeconds(0) : null;
+          original = new Date(original).setSeconds(0);
       }
       if (!modified) modified = "";
       if (!original) original = "";

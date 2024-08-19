@@ -38,18 +38,17 @@ function TextInput({
         fmt = "dd.MM.yyyy HH:mm";
     }
     const dta = fmt ? getFormattedDate(value, fmt) : value;
-    setData(dta);
-    if (dta) handleChange(dta);
+    if (dta) handleChange(dta, "init");
   }, [value]);
   const [inputType, setInputType] = useState("text");
   useEffect(() => {
     if (format && format.includes("password")) setInputType("password");
   }, []);
-  function handleChange(value) {
-    setDirty(true);
+  function handleChange(value, cs) {
+    if (cs !== "init") setDirty(true);
     setData(value);
     let valid = {valid: true, msg: null};
-    if (required) valid = validate(value);
+    if (required && type !== "select") valid = validate(value);
     onHandleChange(
       name,
       valid.valid,
@@ -144,7 +143,7 @@ function TextInput({
             value={data}
             disabled={disabled}
             onChange={(e) => {
-              handleChange(e.target.value);
+              handleChange(e.target.value, type);
             }}
             name={name}
             autoComplete="on"
@@ -180,7 +179,7 @@ function TextInput({
           value={data === null ? "" : data}
           disabled={disabled}
           onChange={(e) => {
-            handleChange(e.target.value);
+            handleChange(e.target.value, type);
           }}
           rows={rows}
           name={name}
@@ -191,10 +190,7 @@ function TextInput({
         <select
           className={`text ${fieldValid.valid ? "valid" : "not-valid"}`}
           onChange={(e) => {
-            setDirty(true);
-            setData(e.target.value);
-            onHandleChange(name, true, e.target.value);
-            setFieldValid({valid: true, msg: null});
+            handleChange(e.target.value, type);
           }}
           value={data}
         >
