@@ -665,6 +665,11 @@ div.page-header .page-loader {
   top:10px;
   left:50%;
 }
+div.modal-content .page-loader {
+  position:fixed;
+  top:250px;
+  left:calc(50vw - 40px);
+}
 /* FORM CONTROLS */
 ::placeholder {
   text-align: center;
