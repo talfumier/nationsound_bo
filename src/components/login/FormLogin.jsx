@@ -8,6 +8,7 @@ import {
   forgotPassword,
   decodeJWT,
 } from "../../services/httpUsers.js";
+import PageLoader from "../common/PageLoader.jsx";
 import TextInput from "../common/TextInput.jsx";
 import CheckBox from "../common/CheckBox.jsx";
 import {toastInfo} from "../common/toastSwal/ToastMessages.js";
@@ -25,6 +26,11 @@ export async function requestNewPwd(email) {
 }
 
 function FormLogin({}) {
+  const [isLoading, setIsloading] = useState(false);
+  useEffect(() => {
+    if (isLoading && document.getElementsByClassName("page-loader").length > 0)
+      document.getElementsByClassName("page-loader")[0].style.display = "block";
+  }, [isLoading]);
   const fields = [
     {
       name: "user_id",
@@ -68,6 +74,7 @@ function FormLogin({}) {
   async function handleSubmit() {
     try {
       if (!cookies.user) {
+        setIsloading(true);
         let res = null;
         switch (data.creation) {
           case true: //register case
@@ -81,6 +88,7 @@ function FormLogin({}) {
               to: "fr",
             });
             toastInfo(text);
+            setIsloading(false);
             break;
           case false: //login case
             res = await login(data.data.user_id, data.data.password);
@@ -89,6 +97,7 @@ function FormLogin({}) {
               path: "/",
               expires: new Date(exp * 1000),
             });
+            setIsloading(false);
         }
       }
     } catch (error) {}
@@ -100,6 +109,7 @@ function FormLogin({}) {
   return (
     <div className="modal">
       <div className="modal-content">
+        {isLoading && <PageLoader></PageLoader>}
         {fields.map((field, idx) => {
           return (
             (idx !== 2 ? true : data.creation ? true : false) && (
