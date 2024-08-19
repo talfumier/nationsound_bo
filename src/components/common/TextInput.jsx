@@ -39,7 +39,7 @@ function TextInput({
     }
     const dta = fmt ? getFormattedDate(value, fmt) : value;
     setData(dta);
-    handleChange(value);
+    if (dta) handleChange(dta);
   }, [value]);
   const [inputType, setInputType] = useState("text");
   useEffect(() => {
