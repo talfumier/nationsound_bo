@@ -1,6 +1,12 @@
+import {useEffect} from "react";
 import data from "./data.json";
 
-function LegalNotice() {
+function LegalNotice({onHandleRegister}) {
+  const location = window.location;
+  const urlParams = new URLSearchParams(location.search);
+  useEffect(() => {
+    onHandleRegister(urlParams.get("register") ? true : false);
+  });
   const browsers = [
     {
       browser: "Google Chrome",
@@ -24,7 +30,9 @@ function LegalNotice() {
     },
   ];
   return (
-    <div className="legal-notice">
+    <div
+      className={`legal-notice ${urlParams.get("register") ? "register" : ""}`}
+    >
       <ol>
         {Object.keys(data).map((key, idx) => {
           return (

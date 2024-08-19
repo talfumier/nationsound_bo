@@ -822,6 +822,9 @@ div.save-reminder {
 div.legal-notice {
   overflow-y: auto;
 }
+div.legal-notice.register {
+  grid-column: 1/-1;
+}
 div.legal-notice h2 {
   margin-bottom:10px;
 }

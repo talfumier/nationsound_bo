@@ -95,7 +95,7 @@ function FormLogin({}) {
   }
   function handleEnter() {
     if (disabled) return;
-    handleSubmit();
+    document.getElementById("button-connect").click();
   }
   return (
     <div className="modal">
@@ -131,7 +131,7 @@ function FormLogin({}) {
             label={
               <div className="link-CGU-CGV">
                 J'ai lu et accepte les{" "}
-                <a href="/CGU-CGV" target="_blank">
+                <a href="/legal-notice?register=true" target="_blank">
                   termes et conditions
                 </a>
               </div>
@@ -145,6 +145,7 @@ function FormLogin({}) {
           ></CheckBox>
         )}
         <button
+          id="button-connect"
           className={`btn btn-info connect ${disabled ? "disabled" : ""}`}
           onClick={() => {
             if (disabled) return;

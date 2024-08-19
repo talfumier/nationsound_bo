@@ -39,22 +39,21 @@ function TextInput({
     }
     const dta = fmt ? getFormattedDate(value, fmt) : value;
     setData(dta);
+    if (dta) handleChange(dta);
   }, [value]);
   const [inputType, setInputType] = useState("text");
   useEffect(() => {
     if (format && format.includes("password")) setInputType("password");
   }, []);
-  function handleChange(e) {
+  function handleChange(value) {
     setDirty(true);
-    setData(e.target.value);
+    setData(value);
     let valid = {valid: true, msg: null};
-    if (required) valid = validate(e.target.value);
+    if (required) valid = validate(value);
     onHandleChange(
       name,
       valid.valid,
-      format !== "date" && format !== "date-time"
-        ? e.target.value
-        : strToDate(e.target.value)
+      format !== "date" && format !== "date-time" ? value : strToDate(value)
     );
     setFieldValid(valid);
   }
@@ -144,7 +143,9 @@ function TextInput({
             placeholder={placeholder}
             value={data}
             disabled={disabled}
-            onChange={handleChange}
+            onChange={(e) => {
+              handleChange(e.target.value);
+            }}
             name={name}
             autoComplete="on"
             onBlur={(e) => {
@@ -178,7 +179,9 @@ function TextInput({
           placeholder={placeholder}
           value={data === null ? "" : data}
           disabled={disabled}
-          onChange={handleChange}
+          onChange={(e) => {
+            handleChange(e.target.value);
+          }}
           rows={rows}
           name={name}
           autoComplete="on"

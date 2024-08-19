@@ -42,6 +42,7 @@ function App() {
     handleExpiration(currentUser.exp);
   }, [currentUser]);
 
+  const [register, setRegister] = useState(false);
   const [selected, setSelected] = useState({});
   const [containers, setContainers] = useState([]);
 
@@ -98,66 +99,76 @@ function App() {
       <Header></Header>
       <div className="app-wrapper">
         <div className="app-main-content">
-          {!cookies.user && !resetPwd.value && <FormLogin></FormLogin>}
+          {!cookies.user && !resetPwd.value && !register && (
+            <FormLogin></FormLogin>
+          )}
           {!cookies.user && resetPwd.value && (
             <FormRecover id={resetPwd.id} token={resetPwd.random}></FormRecover> //forgot password case
           )}
-          {cookies.user && (
-            <SelectionContext.Provider
-              value={{selected, onHandleSelected: handleSelected}}
+          <SelectionContext.Provider
+            value={{selected, onHandleSelected: handleSelected}}
+          >
+            <ImagesContext.Provider
+              value={{containers, onHandleImages: handleImages}}
             >
-              <ImagesContext.Provider
-                value={{containers, onHandleImages: handleImages}}
-              >
-                {!resetPwd.id && <NavBar></NavBar>}
-                <Routes>
-                  <Route path="/" element={<Home></Home>}></Route>
-                  {Object.keys(formContent).map((key) => {
-                    let master = getMaster(formContent[key].fields);
-                    return (
-                      <Fragment key={key}>
-                        {!formContent[key].entity.noList && (
+              {cookies.user && !resetPwd.id && <NavBar></NavBar>}
+              <Routes>
+                <Route
+                  path="/legal-notice"
+                  element={
+                    <LegalNotice
+                      onHandleRegister={(bl) => {
+                        setRegister(bl);
+                      }}
+                    ></LegalNotice>
+                  }
+                ></Route>
+                {cookies.user && (
+                  <>
+                    <Route path="/" element={<Home></Home>}></Route>
+                    {Object.keys(formContent).map((key) => {
+                      let master = getMaster(formContent[key].fields);
+                      return (
+                        <Fragment key={key}>
+                          {!formContent[key].entity.noList && (
+                            <Route
+                              path={`/${key}s`}
+                              element={
+                                <ListItems
+                                  entity={formContent[key].entity}
+                                  master={master}
+                                  url={`/${key}s`}
+                                ></ListItems>
+                              }
+                            ></Route>
+                          )}
                           <Route
-                            path={`/${key}s`}
+                            path={`/${key}s/:id`}
                             element={
-                              <ListItems
+                              <FormDetails
                                 entity={formContent[key].entity}
-                                master={master}
-                                url={`/${key}s`}
-                              ></ListItems>
+                                fields={formContent[key].fields}
+                              ></FormDetails>
                             }
                           ></Route>
-                        )}
-                        <Route
-                          path={`/${key}s/:id`}
-                          element={
-                            <FormDetails
-                              entity={formContent[key].entity}
-                              fields={formContent[key].fields}
-                            ></FormDetails>
-                          }
-                        ></Route>
-                      </Fragment>
-                    );
-                  })}
-                  <Route
-                    path="/legal-notice"
-                    element={<LegalNotice></LegalNotice>}
-                  ></Route>
-                  <Route
-                    path="/resetpassword" //used for requesting a new password when user is logged in
-                    element={
-                      <FormRecover
-                        id={resetPwd.id}
-                        token={resetPwd.random}
-                      ></FormRecover>
-                    }
-                  ></Route>
-                  <Route path="*" element={<NotFound></NotFound>}></Route>
-                </Routes>
-              </ImagesContext.Provider>
-            </SelectionContext.Provider>
-          )}
+                        </Fragment>
+                      );
+                    })}
+                    <Route
+                      path="/resetpassword" //used for requesting a new password when user is logged in
+                      element={
+                        <FormRecover
+                          id={resetPwd.id}
+                          token={resetPwd.random}
+                        ></FormRecover>
+                      }
+                    ></Route>
+                    <Route path="*" element={<NotFound></NotFound>}></Route>
+                  </>
+                )}
+              </Routes>
+            </ImagesContext.Provider>
+          </SelectionContext.Provider>
         </div>
         <ContainerToast></ContainerToast>
       </div>
