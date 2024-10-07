@@ -72,7 +72,7 @@ function NavBar() {
           {avatar[0] === "text" ? (
             avatar[1]
           ) : (
-            <img src={avatar[1]} alt=""></img>
+            <img src={avatar[1]} alt="avatar"></img>
           )}
         </div>
       </NavLink>

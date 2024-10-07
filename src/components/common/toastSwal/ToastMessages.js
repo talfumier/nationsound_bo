@@ -20,6 +20,8 @@ export function toastWarning(msg) {
   });
 }
 export function toastError(msg) {
+  const elt = document.getElementsByClassName("page-loader");
+  if (elt.length > 0) elt[0].style.display = "none";
   return toast.error(style(msg), {
     progressClassName: "error-progress-bar",
     closeOnClick: true,

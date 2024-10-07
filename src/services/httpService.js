@@ -12,7 +12,6 @@ axios.interceptors.response.use(
           to: "fr",
         })
       );
-      document.getElementsByClassName("page-loader")[0].style.display = "none";
       return Promise.reject("expected error returned from API");
     }
     return Promise.resolve(response);
