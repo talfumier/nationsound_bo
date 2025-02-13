@@ -100,6 +100,7 @@ function NavBar() {
         );
       })}
       <hr></hr>
+      {/*
       <NavLink
         target="_blank"
         to="https://henri.mspr.dev/wp-admin/edit.php?post_type=page&page=tickets-attendees&event_id=29333"
@@ -112,6 +113,10 @@ function NavBar() {
           content="Lien vers site WordPress"
         />
         <p className="wp-anchor">Billetterie</p>
+      </NavLink>
+        */}
+      <NavLink to="/tickets">
+        <p>Billeterie</p>
       </NavLink>
       <hr></hr>
       <NavLink target="_blank" to="https://ng-nation-sound.vercel.app/">

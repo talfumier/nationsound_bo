@@ -442,5 +442,39 @@
         "listMaster": true
       }
     ]
+  },
+  "ticket": {
+    "entity": {
+      "name": "ticket",
+      "label": "Forfait",
+      "labels": "Forfaits",
+      "orderBy": {"field": "pass1", "order": "desc"}
+    },
+    "fields": [
+      {
+        "name": "category",
+        "label": "Catégorie",
+        "type": "textarea",
+        "listMaster": true
+      },
+      {
+        "name": "pass1",
+        "label": "Pass 1 jour (EUR)",
+        "type": "input",
+        "rows": "1"
+      },
+      {
+        "name": "pass2",
+        "label": "Pass 2 jours (EUR)",
+        "type": "input",
+        "rows": "1"
+      },
+      {
+        "name": "pass3",
+        "label": "Pass 3 jours (EUR)",
+        "type": "input",
+        "rows": "1"
+      }
+    ]
   }
 }
