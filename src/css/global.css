@@ -26,6 +26,7 @@
   --beige-opaque8: rgb(240, 234, 200, .8);
   --beige-opaque9: rgb(240, 234, 200, .9);
   --blue: #4472C4;
+  --blue-navbar:#105bdb;
 }
 html {
   font-size: 62.5%;
@@ -301,9 +302,11 @@ div.avatar img {
 }
 .navbar a:link {
   text-decoration: none;
+  color: var(--blue-navbar);
 }
 .navbar a:visited {
   text-decoration: none;
+  color: var(--blue-navbar);
 }
 .navbar p.legal-notice {
   font-size:1.5rem;
@@ -566,6 +569,9 @@ div.product-details {
   div.product-details.newsletter div.input-container {
     width:100%;
   }
+  div.product-details.ticket {
+    grid-template-rows: max(120px) max(30px) max(30px) 
+  }
 }
 @media (min-width:992px) {
   div.product-details.faq {
@@ -592,6 +598,11 @@ div.product-details {
   div.product-details.user {
     padding-top:20px;
     grid-template-rows: max(100px) max(80px) max(30px) max(350px);
+  }
+}
+@media (min-width:1200px){
+  div.product-details.ticket {
+    grid-template-columns: 1fr 180px 180px 180px;
   }
 }
 div.file-container {
@@ -693,7 +704,7 @@ div.input-container select {
   border: solid 1px grey;
   border-radius: 5px;
   resize: vertical;
-}
+ }
 div.input-container textarea.disabled,
 div.input-container input.disabled {
   cursor:not-allowed;
